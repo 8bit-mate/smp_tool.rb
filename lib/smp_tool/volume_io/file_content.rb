@@ -2,6 +2,9 @@
 
 module SMPTool
   module VolumeIO
+    #
+    # Content of a single entry (file).
+    #
     class FileContent < BinData::String
       default_parameter read_length: -> { all_entries.to_a[index].n_clusters * CLUSTER_SIZE }
       default_parameter pad_byte: PAD_BYTE

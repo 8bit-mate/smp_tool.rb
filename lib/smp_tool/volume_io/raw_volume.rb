@@ -3,7 +3,6 @@
 require_relative "bootloader"
 require_relative "home_block"
 require_relative "directory"
-require_relative "data_entry"
 require_relative "file_content"
 require_relative "data"
 
@@ -12,9 +11,9 @@ module SMPTool
     #
     # Full volume.
     #
-    class Volume < BinData::Record
-      hide :bootloader
-      hide :home_block
+    class RawVolume < BinData::Record
+      #       hide :bootloader
+      #       hide :home_block
 
       bootloader :bootloader
       home_block :home_block
@@ -44,7 +43,7 @@ module SMPTool
       virtual :n_max_entries_per_dir_seg,
               initial_value: -> { directory.segments.first.n_max_entries }
 
-      virtual :n_dir_seg,
+      virtual :n_dir_segs,
               initial_value: -> { directory.segments.length }
     end
   end

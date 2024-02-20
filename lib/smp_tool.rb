@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require "bindata"
+require "delegate"
 require "dec_radix_50"
 require "dry/validation"
+require "forwardable"
 require "injalid_dejice"
 require "zeitwerk"
 
@@ -24,6 +26,7 @@ module SMPTool
   #
 
   PAD_BYTE = 0x20
+  PAD_WORD = 0x2020
 
   # Sizes, in clusters:
   N_SYS_CLUSTERS = 2 # Bootloader + home block.

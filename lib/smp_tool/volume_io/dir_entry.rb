@@ -15,7 +15,7 @@ module SMPTool
 
       # RADIX-50 filename (6 bytes):
       array :filename, onlyif: -> { status != DIR_SEG_FOOTER }, initial_length: 3 do
-        uint16le initial_value: 0x2020
+        uint16le initial_value: PAD_WORD
       end
 
       # Number of clusters occupied by the file:
