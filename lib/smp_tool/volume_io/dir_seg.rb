@@ -18,7 +18,7 @@ module SMPTool
         dir_entry :dir_entry
       end
 
-      virtual :n_clusters_per_dir_seg, initial_value: N_CLUSTERS_PER_DIR_SEG
+      virtual :n_clusters_per_dir_seg, initial_value: -> { header.data_offset == 3 ? 1 : N_CLUSTERS_PER_DIR_SEG }
       virtual :entry_size, initial_value: -> { ENTRY_BASE_SIZE + header.n_extra_bytes_per_entry }
       virtual :n_max_entries, initial_value: lambda {
         (((n_clusters_per_dir_seg * CLUSTER_SIZE) - header.num_bytes - FOOTER_SIZE) / entry_size).floor

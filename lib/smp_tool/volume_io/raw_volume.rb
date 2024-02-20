@@ -45,6 +45,9 @@ module SMPTool
 
       virtual :n_dir_segs,
               initial_value: -> { directory.segments.length }
+
+      virtual :n_clusters_per_dir_seg,
+              initial_value: -> { directory.segments.first.n_clusters_per_dir_seg }
     end
   end
 end

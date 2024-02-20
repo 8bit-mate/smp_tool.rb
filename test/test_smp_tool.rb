@@ -33,6 +33,11 @@ class TestSMPTool < Minitest::Test
     assert_equal 121, n_files
   end
 
+  def test_read_micro_vol_bas10
+    io = read_bin_file("./data/read/basic_10/micro_bas_10.bin")
+    obj = SMPTool::VirtualVolume::Volume.read_io(io)
+  end
+
   def test_virtual_volume_read_bas10
     io = read_bin_file("./data/read/basic_10/full_volume_121_bas_10.bin")
 
@@ -47,13 +52,12 @@ class TestSMPTool < Minitest::Test
 
     obj = SMPTool::VirtualVolume::Volume.read_io(io)
     obj.rename_file("MEGU5 BAS", "MEGU6 BAS")
-    obj.delete_file("MEGU6 BAS")
 
-    # obj.extract_file(
-    #   SMPTool::Filename.new(ascii: "MEGU6 BAS")
-    # )
+    obj.extract_file("MEGU6 BAS")
 
     obj.extract_all_files
+
+    obj.delete_file("MEGU6 BAS")
 
     obj.inspect
   end

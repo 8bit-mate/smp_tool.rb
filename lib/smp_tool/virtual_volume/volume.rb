@@ -51,7 +51,7 @@ module SMPTool
           n_extra_bytes_per_entry: raw_volume.n_extra_bytes_per_entry,
           n_max_entries_per_dir_seg: raw_volume.n_max_entries_per_dir_seg,
           n_dir_segs: raw_volume.n_dir_segs,
-          n_clusters_per_dir_seg: N_CLUSTERS_PER_DIR_SEG
+          n_clusters_per_dir_seg: raw_volume.n_clusters_per_dir_seg
         }
       end
 
@@ -74,31 +74,64 @@ module SMPTool
         ).call
       end
 
-      def extract_file(*file_ids)
-        Utils::FileExtracter.new(@data).extract_file(*file_ids)
+      #
+      # Extract a file by an ASCII filename.
+      #
+      # @param [<String>] *ascii_ids
+      #   ASCII filenames.
+      #
+      # @return [<Type>] <description>
+      #
+      def extract_file(*ascii_ids)
+        filenames = *ascii_ids.map { |id| Filename.new(ascii: id) }
+
+        _extract_file(*filenames)
       end
 
       def extract_all_files
-        file_ids = @data.reject { |e| e.status == EMPTY_ENTRY }
-                        .map { |e| Filename.new(radix50: e.filename) }
+        filenames = @data.reject { |e| e.status == EMPTY_ENTRY }
+                         .map { |e| Filename.new(radix50: e.filename) }
 
-        extract_file(*file_ids)
+        _extract_file(*filenames)
       end
 
+      #
+      # Rename file.
+      #
+      # @param [<String>] old_filename
+      # @param [<String>] new_filename
+      #
+      # @return [Volume] self
+      #
       def rename_file(old_filename, new_filename)
         @data.rename_file(
           Filename.new(ascii: old_filename),
           Filename.new(ascii: new_filename)
         )
+
+        self
       end
 
+      #
+      # Delete file.
+      #
+      # @param [<String>] filename
+      #
+      # @return [Volume] self
+      #
       def delete_file(filename)
         @data.delete_file(
           Filename.new(ascii: filename)
         )
+
+        self
       end
 
       private
+
+      def _extract_file(*filenames)
+        Utils::FileExtracter.new(@data).extract_file(*filenames)
+      end
 
       def _volume_params
         {
