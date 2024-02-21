@@ -26,6 +26,7 @@ module SMPTool
   #
 
   PAD_BYTE = 0x20
+  PAD_CHR = PAD_BYTE.chr.freeze
   PAD_WORD = 0x2020
 
   # Sizes, in clusters:

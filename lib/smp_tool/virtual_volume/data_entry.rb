@@ -28,7 +28,7 @@ module SMPTool
       def resize(new_size)
         @header.resize(new_size)
 
-        @data = @data.slice(0, new_size).ljust(new_size, PAD_BYTE.chr)
+        @data = @data.slice(0, new_size).ljust(new_size, PAD_CHR)
 
         self
       end
@@ -38,7 +38,7 @@ module SMPTool
       #
       def clean
         @header.make_empty.clean_filename
-        @data = @data.gsub(/./m, PAD_BYTE.chr)
+        @data = @data.gsub(/./m, PAD_CHR)
 
         self
       end

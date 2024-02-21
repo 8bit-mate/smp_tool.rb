@@ -83,7 +83,7 @@ module SMPTool
           DataEntryHeader.new(
             _free_entry_header_params(n_free_clusters)
           ),
-          PAD_BYTE.chr * (n_free_clusters * CLUSTER_SIZE)
+          PAD_CHR * (n_free_clusters * CLUSTER_SIZE)
         )
       end
 
