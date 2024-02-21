@@ -31,7 +31,6 @@ module SMPTool
       # The use in the v.2.0 is unknown, probably it was reserved for a checksum.
       # BASIC v.2.0 always sets it to 0x00A0.
       uint16le :extra_word,
-               initial_value: EXTRA_WORD_NONE,
                onlyif: lambda {
                          status != DIR_SEG_FOOTER && header.n_extra_bytes_per_entry.positive?
                        }

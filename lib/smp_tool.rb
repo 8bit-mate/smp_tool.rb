@@ -49,7 +49,4 @@ module SMPTool
   # Default entry attributes:
   DEF_CH_JOB = 0x0000
   DEF_DATE = 0xFFFF
-
-  EXTRA_WORD_NONE = 0x0000 # Extra word won't be included in the dirseg header (BASIC v.1.0).
-  EXTRA_WORD_EXPL = 0x00A0 # Explicit extra word (BASIC v.2.0).
 end

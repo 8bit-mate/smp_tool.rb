@@ -26,12 +26,15 @@ module SMPTool
             end
           end
 
+          # Extra word value is defined by the target BASIC version,
+          # and the target BASIC version can be identified by the
+          # number of extra bytes per entry (and vice versa).
           def choose_extra_word(n_extra_bytes_per_entry)
             case n_extra_bytes_per_entry
             when 0
-              EXTRA_WORD_NONE
+              Basic10::ENTRY_EXTRA_WORD
             else
-              EXTRA_WORD_EXPL
+              Basic20::ENTRY_EXTRA_WORD
             end
           end
         end
