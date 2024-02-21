@@ -6,57 +6,65 @@ module SMPTool
     # Header of a 'virtual' data entry.
     #
     class DataEntryHeader
-      extend Forwardable
-
-      # def_delegator :@filename, :radix50, :filename
-
       attr_reader :status, :n_clusters, :ch_job, :date, :extra_word
 
-      def initialize(raw_dir_entry)
-        @status = raw_dir_entry.status
-        @filename = Filename.new(radix50: raw_dir_entry.filename)
-        @n_clusters = raw_dir_entry.n_clusters
-        @ch_job = raw_dir_entry.ch_job
-        @date = raw_dir_entry.date
-        @extra_word = raw_dir_entry.extra_word
+      def initialize(parameters)
+        @status = parameters.status
+        @filename = Filename.new(radix50: parameters.filename)
+        @n_clusters = parameters.n_clusters
+        @ch_job = parameters.ch_job
+        @date = parameters.date
+        @extra_word = parameters.extra_word
+      end
+
+      def resize(new_size)
+        @n_clusters = new_size
       end
 
       def filename
         @filename.radix50
       end
 
-      def make_permanent
-        @status = PERM_ENTRY
+      def permanent_entry?
+        @status == PERM_ENTRY
+      end
 
-        self
+      def empty_entry?
+        @status == EMPTY_ENTRY
+      end
+
+      def make_permanent
+        _set_status(PERM_ENTRY)
       end
 
       def make_empty
-        @status = EMPTY_ENTRY
-
-        self
+        _set_status(EMPTY_ENTRY)
       end
 
       def clean_filename
-        @filename = _new_filename(
+        _new_filename(
           [PAD_WORD, PAD_WORD, PAD_WORD]
         )
-
-        self
       end
 
       def rename(new_radix_id)
-        @filename = _new_filename(
+        _new_filename(
           new_radix_id
         )
-
-        self
       end
 
       private
 
+      def _set_status(new_status)
+        @status = new_status
+
+        self
+      end
+
       def _new_filename(radix50_id)
-        Filename.new(radix50: radix50_id)
+        @filename = Filename.new(radix50: radix50_id)
+
+        self
       end
     end
   end

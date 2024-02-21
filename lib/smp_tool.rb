@@ -37,8 +37,18 @@ module SMPTool
   FOOTER_SIZE = 2
   ENTRY_BASE_SIZE = 14
 
+  # Sizes, in 16-bit words:
+  RAD50_FN_SIZE = 3 # RADIX-50 filename size.
+
   # Directory entry status codes.
   EMPTY_ENTRY = 0x0200    # Empty entry.
   PERM_ENTRY = 0x0400     # Permanent file (occupied entry).
   DIR_SEG_FOOTER = 0x0800 # Directory segment footer, a.k.a. end-of-segment marker.
+
+  # Default entry attributes:
+  DEF_CH_JOB = 0x0000
+  DEF_DATE = 0xFFFF
+
+  EXTRA_WORD_NONE = 0x0000 # Extra word won't be included in the dirseg header (BASIC v.1.0).
+  EXTRA_WORD_EXPL = 0x00A0 # Explicit extra word (BASIC v.2.0).
 end

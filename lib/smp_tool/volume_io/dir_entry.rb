@@ -14,7 +14,7 @@ module SMPTool
       uint16le :status
 
       # RADIX-50 filename (6 bytes):
-      array :filename, onlyif: -> { status != DIR_SEG_FOOTER }, initial_length: 3 do
+      array :filename, onlyif: -> { status != DIR_SEG_FOOTER }, initial_length: RAD50_FN_SIZE do
         uint16le initial_value: PAD_WORD
       end
 
@@ -22,17 +22,19 @@ module SMPTool
       uint16le :n_clusters, onlyif: -> { status != DIR_SEG_FOOTER }
 
       # Job & channel, unused in the MK90:
-      uint16le :ch_job, onlyif: -> { status != DIR_SEG_FOOTER }, initial_value: 0x0000
+      uint16le :ch_job, onlyif: -> { status != DIR_SEG_FOOTER }, initial_value: DEF_CH_JOB
 
       # Creation date, unused in the MK90:
-      uint16le :date, onlyif: -> { status != DIR_SEG_FOOTER }, initial_value: 0xFFFF
+      uint16le :date, onlyif: -> { status != DIR_SEG_FOOTER }, initial_value: DEF_DATE
 
       # Extra word is unused in the BASIC v.1.0, but it is required in the BASIC v.2.0.
       # The use in the v.2.0 is unknown, probably it was reserved for a checksum.
       # BASIC v.2.0 always sets it to 0x00A0.
-      uint16le :extra_word, initial_value: 0x0000, onlyif: lambda {
-                                                             status != DIR_SEG_FOOTER && header.n_extra_bytes_per_entry.positive?
-                                                           }
+      uint16le :extra_word,
+               initial_value: EXTRA_WORD_NONE,
+               onlyif: lambda {
+                         status != DIR_SEG_FOOTER && header.n_extra_bytes_per_entry.positive?
+                       }
 
       private
 

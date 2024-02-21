@@ -35,7 +35,7 @@ class TestSMPTool < Minitest::Test
 
   def test_read_micro_vol_bas10
     io = read_bin_file("./data/read/basic_10/micro_bas_10.bin")
-    obj = SMPTool::VirtualVolume::Volume.read_io(io)
+    SMPTool::VirtualVolume::Volume.read_io(io)
   end
 
   def test_virtual_volume_read_bas10
@@ -48,17 +48,26 @@ class TestSMPTool < Minitest::Test
   end
 
   def test_file_extractor
-    io = read_bin_file("./data/read/basic_10/standard_vol_bas_10.bin")
+    io = read_bin_file("./data/read/basic_10/free_space_bas_10.bin")
 
     obj = SMPTool::VirtualVolume::Volume.read_io(io)
-    obj.rename_file("MEGU5 BAS", "MEGU6 BAS")
 
-    obj.extract_file("MEGU6 BAS")
+    # p obj.inspect
 
-    obj.extract_all_files
+    # obj.rename_file("MEGU5 BAS", "MEGU6 BAS")
 
-    obj.delete_file("MEGU6 BAS")
+    # obj.extract_file("MEGU6 BAS")
 
-    obj.inspect
+    # obj.extract_all_files
+
+    # obj.delete_file("MEGU6 BAS")
+
+    obj.squeeze
+
+    # raw = obj.to_raw_volume
+
+    # File.open("test.bin", "wb") do |io|
+    #   raw.write(io)
+    # end
   end
 end

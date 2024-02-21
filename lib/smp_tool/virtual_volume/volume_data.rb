@@ -6,6 +6,13 @@ module SMPTool
     # Provides additional features for the Volume#data.
     #
     class VolumeData < SimpleDelegator
+      def initialize(obj, extra_word)
+        @obj = obj
+        @extra_word = extra_word
+
+        super(obj)
+      end
+
       #
       # Rename file on the virtual volume.
       #
@@ -41,7 +48,7 @@ module SMPTool
       # @return [VolumeData] self
       #
       # @raise [ArgumentError]
-      #   - File `old_id` not found.
+      #   - File `file_id` not found.
       #
       def delete_file(file_id)
         idx = _find_idx(file_id)
@@ -53,7 +60,53 @@ module SMPTool
         self
       end
 
+      #
+      # Consolidate all free space at the end of the volume.
+      #
+      def squeeze
+        n_free_clusters = self.select(&:empty_entry?)
+                              .sum(&:n_clusters)
+
+        return self if n_free_clusters.zero?
+
+        reject!(&:empty_entry?)
+
+        _append_empty_entry(n_free_clusters)
+
+        self
+      end
+
       private
+
+      def _append_empty_entry(n_free_clusters)
+        _append_entry(
+          DataEntryHeader.new(
+            _free_entry_header_params(n_free_clusters)
+          ),
+          PAD_BYTE.chr * (n_free_clusters * CLUSTER_SIZE)
+        )
+      end
+
+      def _append_entry(header, data)
+        append(
+          DataEntry.new(
+            header: header,
+            data: data
+          )
+        )
+      end
+
+      def _free_entry_header_params(n_clusters)
+        Struct.new(:status, :filename, :n_clusters, :ch_job, :date, :extra_word)
+              .new(
+                status: EMPTY_ENTRY,
+                filename: [PAD_WORD, PAD_WORD, PAD_WORD],
+                n_clusters: n_clusters,
+                ch_job: DEF_CH_JOB,
+                date: DEF_DATE,
+                extra_word: @extra_word
+              )
+      end
 
       def _raise_file_not_found(file_id)
         raise ArgumentError, "File '#{file_id.print_ascii}' not found on the volume"

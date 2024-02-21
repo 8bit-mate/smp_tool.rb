@@ -9,13 +9,28 @@ module SMPTool
       extend Forwardable
 
       def_delegators :@header, :status, :filename, :n_clusters, :ch_job, :date, :extra_word,
-                     :rename
+                     :rename, :permanent_entry?, :empty_entry?
 
       attr_reader :header, :data
 
       def initialize(header:, data:)
         @header = header
         @data = data
+      end
+
+      #
+      # Resize data string to a new size.
+      #
+      # @param [Integer] new_size
+      #
+      # @return [DataEntry] self
+      #
+      def resize(new_size)
+        @header.resize(new_size)
+
+        @data = @data.slice(0, new_size).ljust(new_size, PAD_BYTE.chr)
+
+        self
       end
 
       #
