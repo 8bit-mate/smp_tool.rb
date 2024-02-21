@@ -6,7 +6,7 @@ module SMPTool
       #
       # Converts virtual volume to the raw volume.
       #
-      class RawVolumeInitializer
+      class ConverterToRawVolume
         def initialize(
           volume_params,
           volume_data

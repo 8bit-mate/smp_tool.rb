@@ -35,14 +35,14 @@ class TestSMPTool < Minitest::Test
 
   def test_read_micro_vol_bas10
     io = read_bin_file("./data/read/basic_10/micro_bas_10.bin")
-    SMPTool::VirtualVolume::Volume.read_io(io)
+    SMPTool::VirtualVolume::Utils::ConverterFromRawVolume.read_io(io)
   end
 
   def test_virtual_volume_read_bas10
     io = read_bin_file("./data/read/basic_10/full_volume_121_bas_10.bin")
 
     orig_vol = SMPTool::VolumeIO::RawVolume.read(io)
-    conv_vol = SMPTool::VirtualVolume::Volume.read_raw_volume(orig_vol).to_raw_volume
+    conv_vol = SMPTool::VirtualVolume::Utils::ConverterFromRawVolume.read_raw_volume(orig_vol).to_raw_volume
 
     assert_equal orig_vol.to_binary_s, conv_vol.to_binary_s
   end
@@ -50,7 +50,7 @@ class TestSMPTool < Minitest::Test
   def test_file_extractor
     io = read_bin_file("./data/read/basic_10/free_space_bas_10.bin")
 
-    obj = SMPTool::VirtualVolume::Volume.read_io(io)
+    obj = SMPTool::VirtualVolume::Utils::ConverterFromRawVolume.read_io(io)
 
     # p obj.inspect
 
@@ -62,9 +62,9 @@ class TestSMPTool < Minitest::Test
 
     # obj.delete_file("MEGU6 BAS")
 
-    obj.squeeze
+    p obj.squeeze
 
-    # raw = obj.to_raw_volume
+    # p raw = obj.to_raw_volume
 
     # File.open("test.bin", "wb") do |io|
     #   raw.write(io)
