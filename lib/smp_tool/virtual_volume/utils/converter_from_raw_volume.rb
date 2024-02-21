@@ -3,6 +3,9 @@
 module SMPTool
   module VirtualVolume
     module Utils
+      #
+      # Converts raw volume to the virtual volume.
+      #
       module ConverterFromRawVolume
         class << self
           private
