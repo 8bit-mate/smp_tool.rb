@@ -47,27 +47,32 @@ class TestSMPTool < Minitest::Test
     assert_equal orig_vol.to_binary_s, conv_vol.to_binary_s
   end
 
-  def test_file_extractor
-    io = read_bin_file("./data/read/basic_10/free_space_bas_10.bin")
+  def test_file_converter_to_data_entry_arr
+    SMPTool::VirtualVolume::Utils::FileConverter.hash_arr_to_data_entry_arr(
+      [{
+        filename: [0x000A, 0x000B, 0x000C],
+        data: ["10 PRINT \"Привет, Мир!\""]
+      }],
+      0
+    )
+  end
 
-    obj = SMPTool::VirtualVolume::Utils::ConverterFromRawVolume.read_io(io)
+  def test_file_push
+    io = read_bin_file("./data/read/basic_10/micro_bas_10.bin")
 
-    # p obj.inspect
+    vol = SMPTool::VirtualVolume::Utils::ConverterFromRawVolume.read_io(io)
 
-    # obj.rename_file("MEGU5 BAS", "MEGU6 BAS")
+    vol.f_delete("DIZZY BAS")
 
-    # obj.extract_file("MEGU6 BAS")
+    vol.inspect
 
-    # obj.extract_all_files
+    vol.f_push(
+      {
+        filename: [0x000A, 0x000B, 0x000C],
+        data: ["10 PRINT \"Привет, Мир!\""]
+      }
+    )
 
-    # obj.delete_file("MEGU6 BAS")
-
-    p obj.squeeze
-
-    # p raw = obj.to_raw_volume
-
-    # File.open("test.bin", "wb") do |io|
-    #   raw.write(io)
-    # end
+    vol.inspect
   end
 end

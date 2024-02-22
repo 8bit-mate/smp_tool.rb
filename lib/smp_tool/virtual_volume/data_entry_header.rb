@@ -8,13 +8,13 @@ module SMPTool
     class DataEntryHeader
       attr_reader :status, :n_clusters, :ch_job, :date, :extra_word
 
-      def initialize(parameters)
-        @status = parameters.status
-        @filename = Filename.new(radix50: parameters.filename)
-        @n_clusters = parameters.n_clusters
-        @ch_job = parameters.ch_job
-        @date = parameters.date
-        @extra_word = parameters.extra_word
+      def initialize(params)
+        @status = params[:status]
+        @filename = Filename.new(radix50: params[:filename])
+        @n_clusters = params[:n_clusters]
+        @ch_job = params[:ch_job]
+        @date = params[:date]
+        @extra_word = params[:extra_word] || Basic10::ENTRY_EXTRA_WORD
       end
 
       def resize(new_size)
@@ -41,7 +41,9 @@ module SMPTool
         _set_status(EMPTY_ENTRY)
       end
 
-      def clean_filename
+      def clean
+        make_empty
+
         _new_filename(
           [PAD_WORD, PAD_WORD, PAD_WORD]
         )

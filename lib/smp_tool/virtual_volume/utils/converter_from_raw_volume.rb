@@ -20,7 +20,7 @@ module SMPTool
           def data_entries(entries, data)
             entries.each_with_index.map do |e, i|
               DataEntry.new(
-                header: DataEntryHeader.new(e),
+                header: DataEntryHeader.new(e.snapshot.to_h),
                 data: data[i]
               )
             end

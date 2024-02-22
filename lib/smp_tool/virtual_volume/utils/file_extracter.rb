@@ -4,27 +4,27 @@ module SMPTool
   module VirtualVolume
     module Utils
       #
-      # Extracts file.
+      # Extracts file(s).
       #
       class FileExtracter
         def initialize(data)
           @data = data.reject { |e| e.status == EMPTY_ENTRY }
         end
 
-        def extract_file(*file_ids)
+        def f_extract(*file_ids)
           file_ids.map do |id|
-            _extract_file(id)
+            _f_extract(id)
           end
         end
 
         private
 
-        def _extract_file(id)
+        def _f_extract(id)
           index = @data.find_index { |e| e.filename == id.radix50 }
 
           raise ArgumentError, "File '#{id.ascii}' not found in the volume." unless index
 
-          { filename: id.ascii, content: @data[index].data }
+          { filename: id.print_ascii("."), data: @data[index].data }
         end
       end
     end

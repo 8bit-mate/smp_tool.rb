@@ -10,7 +10,7 @@ module SMPTool
     ASCII_LENGTH = 9  # Characters.
     RADIX_LENGTH = 3  # 16-bit words.
     ASCII_DOT_POS = 6 # Dot position in the printable ASCII filename.
-    SEP_CHR = "•"     # Separation character.
+    DEF_SEP_CHR = "•" # Separation character.
 
     def initialize(options = {})
       _validate_options(options)
@@ -29,8 +29,8 @@ module SMPTool
     #
     # ASCII filename with a dot to separate extension.
     #
-    def print_ascii
-      @ascii.insert(ASCII_DOT_POS, SEP_CHR).delete(" ")
+    def print_ascii(sep_chr = DEF_SEP_CHR)
+      @ascii.insert(ASCII_DOT_POS, sep_chr).delete(" ")
     end
 
     private

@@ -37,7 +37,7 @@ module SMPTool
       # Turn `self` into an empty entry.
       #
       def clean
-        @header.make_empty.clean_filename
+        @header.clean
         @data = @data.gsub(/./m, PAD_CHR)
 
         self
