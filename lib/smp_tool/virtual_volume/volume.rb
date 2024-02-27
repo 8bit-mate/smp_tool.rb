@@ -12,10 +12,15 @@ module SMPTool
 
       attr_reader :data
 
-      def initialize(volume_params:, volume_data:)
-        @volume_params = volume_params
-        @n_max_entries = volume_params[:n_dir_segs] * volume_params[:n_max_entries_per_dir_seg]
-        @data = volume_data
+      def initialize(volume_params:, volume_data: nil)
+        @volume_params = Utils::VolumeParamsValidator.call(volume_params)
+        @extra_word = volume_params[:extra_word]
+        @data = volume_data || _init_empty_volume_data
+
+        @volume_params[:n_max_entries_per_dir_seg] =
+          volume_params[:n_max_entries_per_dir_seg] || _calc_n_max_entries_per_dir_seg
+
+        @n_max_entries = @volume_params[:n_dir_segs] * @volume_params[:n_max_entries_per_dir_seg]
       end
 
       def to_raw_volume
@@ -25,16 +30,14 @@ module SMPTool
         ).call
       end
 
-      def f_push(*files)
+      #
+      # Add file(s) to the volume.
+      #
+      def f_push(*files, &block)
+        block = ->(str) { InjalidDejice.utf_to_koi(str, forced_latin: "\"") } unless block_given?
+
         files.each do |f|
-          file = SMPTool::VirtualVolume::Utils::FileConverter.hash_to_data_entry(
-            f,
-            0
-          )
-
-          @data.f_push(file)
-
-          squeeze
+          _f_push(f, &block)
         end
 
         self
@@ -97,6 +100,37 @@ module SMPTool
       end
 
       private
+
+      def _calc_n_max_entries_per_dir_seg
+        entry_size = ENTRY_BASE_SIZE + @volume_params[:n_extra_bytes_per_entry]
+        (((@volume_params[:n_clusters_per_dir_seg] * CLUSTER_SIZE) - HEADER_SIZE - FOOTER_SIZE) / entry_size).floor
+      end
+
+      def _init_empty_volume_data
+        n_data_clusters = @volume_params[:n_clusters_allocated] -
+                          N_SYS_CLUSTERS -
+                          (@volume_params[:n_dir_segs] * @volume_params[:n_clusters_per_dir_seg])
+
+        data = VolumeData.new(
+          [],
+          @volume_params[:extra_word]
+        )
+
+        data.push_empty_entry(n_data_clusters)
+      end
+
+      def _f_push(f_hash, &block)
+        raise ArgumentError, "Directory table is full." if @data.length > @n_max_entries
+
+        file = SMPTool::VirtualVolume::Utils::FileConverter.hash_to_data_entry(
+          f_hash,
+          @extra_word,
+          &block
+        )
+        @data.f_push(file)
+
+        squeeze
+      end
 
       def _f_extract(*filenames)
         Utils::FileExtracter.new(@data).f_extract(*filenames)

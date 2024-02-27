@@ -63,13 +63,13 @@ module SMPTool
 
         def self.parse_volume_params(raw_volume)
           {
-            bootloader: raw_volume.bootloader.bytes,
-            home_block: raw_volume.home_block.bytes,
-            n_clusters_allocated: raw_volume.n_clusters_allocated,
-            n_extra_bytes_per_entry: raw_volume.n_extra_bytes_per_entry,
-            n_max_entries_per_dir_seg: raw_volume.n_max_entries_per_dir_seg,
-            n_dir_segs: raw_volume.n_dir_segs,
-            n_clusters_per_dir_seg: raw_volume.n_clusters_per_dir_seg,
+            bootloader: raw_volume.bootloader.bytes.to_ary,
+            home_block: raw_volume.home_block.bytes.to_ary,
+            n_clusters_allocated: raw_volume.n_clusters_allocated.to_i,
+            n_extra_bytes_per_entry: raw_volume.n_extra_bytes_per_entry.to_i,
+            n_max_entries_per_dir_seg: raw_volume.n_max_entries_per_dir_seg.to_i,
+            n_dir_segs: raw_volume.n_dir_segs.to_i,
+            n_clusters_per_dir_seg: raw_volume.n_clusters_per_dir_seg.to_i,
             extra_word: choose_extra_word(raw_volume.n_extra_bytes_per_entry)
           }
         end

@@ -7,10 +7,11 @@ module SMPTool
   class Filename
     attr_reader :radix50, :ascii
 
-    ASCII_LENGTH = 9  # Characters.
-    RADIX_LENGTH = 3  # 16-bit words.
+    FN_BASE_LENGTH = 6
+    FN_EXT_LENGTH = 3
+
     ASCII_DOT_POS = 6 # Dot position in the printable ASCII filename.
-    DEF_SEP_CHR = "•" # Separation character.
+    DEF_SEP_CHR = "." # Separation character.
 
     def initialize(options = {})
       _validate_options(options)
@@ -56,11 +57,15 @@ module SMPTool
     end
 
     def _enforce_ascii(str)
-      str.slice(0, ASCII_LENGTH).ljust(ASCII_LENGTH).upcase
+      parts = str.split(".")
+      filename = (parts[0] || "").slice(0, FN_BASE_LENGTH).ljust(FN_BASE_LENGTH).upcase
+      ext = (parts[1] || "").slice(0, FN_EXT_LENGTH).ljust(FN_EXT_LENGTH).upcase
+
+      filename + ext
     end
 
     def _enforce_radix(arr)
-      arr.slice(0, RADIX_LENGTH).fill(0, arr.length...RADIX_LENGTH)
+      arr.slice(0, RAD50_FN_SIZE).fill(0, arr.length...RAD50_FN_SIZE)
     end
   end
 end

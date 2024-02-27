@@ -71,9 +71,7 @@ module SMPTool
 
         reject!(&:empty_entry?)
 
-        push(
-          _new_empty_entry(n_free_clusters)
-        )
+        push_empty_entry(n_free_clusters)
 
         self
       end
@@ -87,7 +85,8 @@ module SMPTool
         idx = index(reverse_each.detect { |e| e.n_clusters >= file.n_clusters && e.empty_entry? })
 
         unless idx
-          raise ArgumentError, "no free space found to fit the file (try to squeeze, delete files or allocate more clusters)"
+          raise ArgumentError,
+                "no free space found to fit the file (try to squeeze, delete files or allocate more clusters)"
         end
 
         _f_push(file, idx)
@@ -95,7 +94,22 @@ module SMPTool
         self
       end
 
+      def push_empty_entry(n_free_clusters)
+        push(_new_empty_entry(n_free_clusters))
+
+        self
+      end
+
       private
+
+      def _new_empty_entry(n_free_clusters)
+        DataEntry.new(
+          header: DataEntryHeader.new(
+            _free_entry_header_params(n_free_clusters)
+          ),
+          data: PAD_CHR * (n_free_clusters * CLUSTER_SIZE)
+        )
+      end
 
       def _f_push(file, idx)
         n_clusters_left = self[idx].n_clusters - file.n_clusters
@@ -107,24 +121,6 @@ module SMPTool
 
         insert(idx, _new_empty_entry(n_clusters_left))
       end
-
-      def _new_empty_entry(n_free_clusters)
-        DataEntry.new(
-          header: DataEntryHeader.new(
-            _free_entry_header_params(n_free_clusters)
-          ),
-          data: PAD_CHR * (n_free_clusters * CLUSTER_SIZE)
-        )
-      end
-
-      # def _append_entry(header, data)
-      #   append(
-      #     DataEntry.new(
-      #       header: header,
-      #       data: data
-      #     )
-      #   )
-      # end
 
       def _free_entry_header_params(n_clusters)
         {

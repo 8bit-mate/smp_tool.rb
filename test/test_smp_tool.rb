@@ -47,31 +47,18 @@ class TestSMPTool < Minitest::Test
     assert_equal orig_vol.to_binary_s, conv_vol.to_binary_s
   end
 
-  def test_file_converter_to_data_entry_arr
-    SMPTool::VirtualVolume::Utils::FileConverter.hash_arr_to_data_entry_arr(
-      [{
-        filename: [0x000A, 0x000B, 0x000C],
-        data: ["10 PRINT \"Привет, Мир!\""]
-      }],
-      0
-    )
-  end
+  def test_init_new_volume
+    test_params = {
+      bootloader: SMPTool::Basic10::DEFAULT_BOOTLOADER,
+      home_block: SMPTool::Basic10::HOME_BLOCK,
+      n_clusters_allocated: 5,
+      n_extra_bytes_per_entry: 0,
+      n_dir_segs: 2,
+      n_clusters_per_dir_seg: 1,
+      extra_word: 0
+    }
 
-  def test_file_push
-    io = read_bin_file("./data/read/basic_10/micro_bas_10.bin")
-
-    vol = SMPTool::VirtualVolume::Utils::ConverterFromRawVolume.read_io(io)
-
-    vol.f_delete("DIZZY BAS")
-
-    vol.inspect
-
-    vol.f_push(
-      {
-        filename: [0x000A, 0x000B, 0x000C],
-        data: ["10 PRINT \"Привет, Мир!\""]
-      }
-    )
+    vol = SMPTool::VirtualVolume::Volume.new(volume_params: test_params)
 
     vol.inspect
   end

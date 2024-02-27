@@ -35,6 +35,7 @@ module SMPTool
 
   # Sizes, in bytes:
   CLUSTER_SIZE = 512
+  HEADER_SIZE = 10
   FOOTER_SIZE = 2
   ENTRY_BASE_SIZE = 14
 
