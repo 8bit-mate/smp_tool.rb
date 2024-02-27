@@ -32,6 +32,7 @@ module SMPTool
   # Sizes, in clusters:
   N_SYS_CLUSTERS = 2 # Bootloader + home block.
   N_CLUSTERS_PER_DIR_SEG = 2
+  N_CLUSTERS_MAX = 127
 
   # Sizes, in bytes:
   CLUSTER_SIZE = 512

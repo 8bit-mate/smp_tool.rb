@@ -30,8 +30,30 @@ module SMPTool
         ).call
       end
 
+      def add_clusters(n_add_clusters)
+        _check_dir_overflow
+
+        return self unless n_add_clusters.positive?
+
+        if n_add_clusters + @volume_params[:n_clusters_allocated] > N_CLUSTERS_MAX
+          raise ArgumentError, "Can't allocate more than #{N_CLUSTERS_MAX} clusters"
+        end
+
+        @volume_params[:n_clusters_allocated] += n_add_clusters
+
+        @data.push_empty_entry(n_add_clusters)
+
+        self
+      end
+
+      def trim
+        @volume_params[:n_clusters_allocated] -= @data.trim
+
+        self
+      end
+
       #
-      # Add file(s) to the volume.
+      # Push file(s) to the volume.
       #
       def f_push(*files, &block)
         block = ->(str) { InjalidDejice.utf_to_koi(str, forced_latin: "\"") } unless block_given?
@@ -101,6 +123,10 @@ module SMPTool
 
       private
 
+      def _check_dir_overflow
+        raise ArgumentError, "Directory table is full." if @data.length == @n_max_entries
+      end
+
       def _calc_n_max_entries_per_dir_seg
         entry_size = ENTRY_BASE_SIZE + @volume_params[:n_extra_bytes_per_entry]
         (((@volume_params[:n_clusters_per_dir_seg] * CLUSTER_SIZE) - HEADER_SIZE - FOOTER_SIZE) / entry_size).floor
@@ -120,7 +146,7 @@ module SMPTool
       end
 
       def _f_push(f_hash, &block)
-        raise ArgumentError, "Directory table is full." if @data.length > @n_max_entries
+        _check_dir_overflow
 
         file = SMPTool::VirtualVolume::Utils::FileConverter.hash_to_data_entry(
           f_hash,

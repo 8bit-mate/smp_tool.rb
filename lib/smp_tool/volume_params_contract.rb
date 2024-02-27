@@ -21,7 +21,7 @@ module SMPTool
 
       required(:n_clusters_allocated).value(
         :integer,
-        lteq?: 127
+        lteq?: N_CLUSTERS_MAX
       )
 
       required(:n_extra_bytes_per_entry).value(

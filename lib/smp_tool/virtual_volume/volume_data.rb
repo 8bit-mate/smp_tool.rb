@@ -64,8 +64,7 @@ module SMPTool
       # Consolidate all free space at the end of the volume.
       #
       def squeeze
-        n_free_clusters = self.select(&:empty_entry?)
-                              .sum(&:n_clusters)
+        n_free_clusters = calc_n_free_clusters
 
         return self if n_free_clusters.zero?
 
@@ -74,6 +73,11 @@ module SMPTool
         push_empty_entry(n_free_clusters)
 
         self
+      end
+
+      def calc_n_free_clusters
+        self.select(&:empty_entry?)
+            .sum(&:n_clusters)
       end
 
       #
@@ -98,6 +102,14 @@ module SMPTool
         push(_new_empty_entry(n_free_clusters))
 
         self
+      end
+
+      def trim
+        n_free_clusters = calc_n_free_clusters
+
+        reject!(&:empty_entry?)
+
+        n_free_clusters
       end
 
       private
