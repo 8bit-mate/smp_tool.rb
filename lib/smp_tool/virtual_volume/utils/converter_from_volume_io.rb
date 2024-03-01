@@ -4,9 +4,9 @@ module SMPTool
   module VirtualVolume
     module Utils
       #
-      # Converts raw volume to the virtual volume.
+      # Converts volume IO to the virtual volume.
       #
-      module ConverterFromRawVolume
+      module ConverterFromVolumeIO
         class << self
           private
 
@@ -37,41 +37,41 @@ module SMPTool
               Basic20::ENTRY_EXTRA_WORD
             end
           end
+
+          def parse_volume_params(volume_io)
+            {
+              bootloader: volume_io.bootloader.bytes.to_ary,
+              home_block: volume_io.home_block.bytes.to_ary,
+              n_clusters_allocated: volume_io.n_clusters_allocated.to_i,
+              n_extra_bytes_per_entry: volume_io.n_extra_bytes_per_entry.to_i,
+              n_max_entries_per_dir_seg: volume_io.n_max_entries_per_dir_seg.to_i,
+              n_dir_segs: volume_io.n_dir_segs.to_i,
+              n_clusters_per_dir_seg: volume_io.n_clusters_per_dir_seg.to_i,
+              extra_word: choose_extra_word(volume_io.n_extra_bytes_per_entry)
+            }
+          end
         end
 
         def self.read_io(io)
-          read_raw_volume(
-            SMPTool::VolumeIO::RawVolume.read(io)
+          read_volume_io(
+            SMPTool::VolumeIO::VolumeIO.read(io)
           )
         end
 
-        def self.read_raw_volume(raw_volume)
-          entries = raw_volume.directory.segments.to_ary.flat_map(&:dir_seg_entries)
-                              .reject { |e| e.status == DIR_SEG_FOOTER }
+        def self.read_volume_io(volume_io)
+          entries = volume_io.directory.segments.to_ary.flat_map(&:dir_seg_entries)
+                             .reject { |e| e.status == DIR_SEG_FOOTER }
 
-          data = raw_volume.data.to_ary
+          data = volume_io.data.to_ary
 
           raise ArgumentError, "entries => data sizes mismatch" unless entries.length == data.length
 
-          volume_params = parse_volume_params(raw_volume)
+          volume_params = parse_volume_params(volume_io)
 
           VirtualVolume::Volume.new(
             volume_params: volume_params,
             volume_data: zip_volume_data(entries, data, volume_params[:extra_word])
           )
-        end
-
-        def self.parse_volume_params(raw_volume)
-          {
-            bootloader: raw_volume.bootloader.bytes.to_ary,
-            home_block: raw_volume.home_block.bytes.to_ary,
-            n_clusters_allocated: raw_volume.n_clusters_allocated.to_i,
-            n_extra_bytes_per_entry: raw_volume.n_extra_bytes_per_entry.to_i,
-            n_max_entries_per_dir_seg: raw_volume.n_max_entries_per_dir_seg.to_i,
-            n_dir_segs: raw_volume.n_dir_segs.to_i,
-            n_clusters_per_dir_seg: raw_volume.n_clusters_per_dir_seg.to_i,
-            extra_word: choose_extra_word(raw_volume.n_extra_bytes_per_entry)
-          }
         end
       end
     end

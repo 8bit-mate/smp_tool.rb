@@ -19,7 +19,7 @@ class TestSMPTool < Minitest::Test
   # BASIC 1.0 ver.
   def test_read_volume_bas10
     io = read_bin_file("./data/read/basic_10/full_volume_121_bas_10.bin")
-    n_files = SMPTool::VolumeIO::RawVolume.read(io).snapshot.data.length
+    n_files = SMPTool::VolumeIO::VolumeIO.read(io).snapshot.data.length
 
     assert_equal 121, n_files
   end
@@ -28,28 +28,28 @@ class TestSMPTool < Minitest::Test
   # BASIC 2.0 ver.
   def test_read_volume_bas20
     io = read_bin_file("./data/read/basic_20/full_volume_121_bas_20.bin")
-    n_files = SMPTool::VolumeIO::RawVolume.read(io).snapshot.data.length
+    n_files = SMPTool::VolumeIO::VolumeIO.read(io).snapshot.data.length
 
     assert_equal 121, n_files
   end
 
   def test_read_micro_vol_bas10
     io = read_bin_file("./data/read/basic_10/micro_bas_10.bin")
-    SMPTool::VirtualVolume::Utils::ConverterFromRawVolume.read_io(io)
+    SMPTool::VirtualVolume::Volume.read_io(io)
   end
 
   def test_virtual_volume_read_bas10
     io = read_bin_file("./data/read/basic_10/full_volume_121_bas_10.bin")
 
-    orig_vol = SMPTool::VolumeIO::RawVolume.read(io)
-    conv_vol = SMPTool::VirtualVolume::Utils::ConverterFromRawVolume.read_raw_volume(orig_vol).to_raw_volume
+    orig_vol = SMPTool::VolumeIO::VolumeIO.read(io)
+    conv_vol = SMPTool::VirtualVolume::Volume.read_volume_io(orig_vol).to_volume_io
 
     assert_equal orig_vol.to_binary_s, conv_vol.to_binary_s
   end
 
   def test_add_clusters
     io = read_bin_file("./data/read/basic_10/micro_bas_10.bin")
-    vol = SMPTool::VirtualVolume::Utils::ConverterFromRawVolume.read_io(io)
+    vol = SMPTool::VirtualVolume::Volume.read_io(io)
 
     vol.add_clusters(1)
 

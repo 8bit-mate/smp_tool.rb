@@ -4,9 +4,9 @@ module SMPTool
   module VirtualVolume
     module Utils
       #
-      # Converts virtual volume to the raw volume.
+      # Converts virtual volume to the volume IO.
       #
-      class ConverterToRawVolume
+      class ConverterToVolumeIO
         def initialize(
           volume_params,
           volume_data
@@ -25,7 +25,7 @@ module SMPTool
         end
 
         def call
-          VolumeIO::RawVolume.new(
+          VolumeIO::VolumeIO.new(
             bootloader: _init_bootloader,
             home_block: _init_home_block,
             directory: _init_directory,

@@ -11,9 +11,9 @@ module SMPTool
     #
     # Full volume.
     #
-    class RawVolume < BinData::Record
-      #       hide :bootloader
-      #       hide :home_block
+    class VolumeIO < BinData::Record
+      hide :bootloader
+      hide :home_block
 
       bootloader :bootloader
       home_block :home_block

@@ -6,11 +6,15 @@ module SMPTool
     # Simplified Ruby representation of the volume.
     #
     class Volume
-      extend Forwardable
-
-      def_delegators :@data, :squeeze
-
       attr_reader :data
+
+      def self.read_volume_io(volume_io)
+        Utils::ConverterFromVolumeIO.read_volume_io(volume_io)
+      end
+
+      def self.read_io(volume_io)
+        Utils::ConverterFromVolumeIO.read_io(volume_io)
+      end
 
       def initialize(volume_params:, volume_data: nil)
         @volume_params = Utils::VolumeParamsValidator.call(volume_params)
@@ -23,13 +27,16 @@ module SMPTool
         @n_max_entries = @volume_params[:n_dir_segs] * @volume_params[:n_max_entries_per_dir_seg]
       end
 
-      def to_raw_volume
-        Utils::ConverterToRawVolume.new(
+      def to_volume_io
+        Utils::ConverterToVolumeIO.new(
           @volume_params,
           @data
         ).call
       end
 
+      #
+      # Allocate more clusters to the volume.
+      #
       def add_clusters(n_add_clusters)
         _check_dir_overflow
 
@@ -46,6 +53,9 @@ module SMPTool
         self
       end
 
+      #
+      # Drop all free clusters.
+      #
       def trim
         @volume_params[:n_clusters_allocated] -= @data.trim
 
@@ -117,6 +127,12 @@ module SMPTool
         @data.f_delete(Filename.new(ascii: filename))
 
         squeeze
+
+        self
+      end
+
+      def squeeze
+        @data.squeeze
 
         self
       end

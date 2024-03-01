@@ -13,7 +13,9 @@ module SMPTool
         loader.push_dir(Pathname(__dir__).join("../")) # lib
         loader.inflector.inflect(
           "smp_tool" => "SMPTool",
-          "volume_io" => "VolumeIO"
+          "volume_io" => "VolumeIO",
+          "converter_from_volume_io" => "ConverterFromVolumeIO",
+          "converter_to_volume_io" => "ConverterToVolumeIO"
         )
         loader.setup
       end
