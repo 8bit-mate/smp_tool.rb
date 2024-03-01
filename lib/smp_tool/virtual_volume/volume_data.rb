@@ -13,6 +13,10 @@ module SMPTool
         super(obj)
       end
 
+      def snapshot
+        map(&:snapshot)
+      end
+
       #
       # Rename file on the virtual volume.
       #

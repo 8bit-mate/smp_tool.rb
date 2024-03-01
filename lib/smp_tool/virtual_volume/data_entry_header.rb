@@ -17,6 +17,17 @@ module SMPTool
         @extra_word = params[:extra_word] || Basic10::ENTRY_EXTRA_WORD
       end
 
+      def snapshot
+        {
+          status: _status_snapshot,
+          filename: @filename.print_ascii,
+          n_clusters: @n_clusters,
+          ch_job: @ch_job,
+          date: @date,
+          extra_word: @extra_word
+        }
+      end
+
       def resize(new_size)
         @n_clusters = new_size
       end
@@ -56,6 +67,17 @@ module SMPTool
       end
 
       private
+
+      def _status_snapshot
+        case @status
+        when EMPTY_ENTRY
+          "empty"
+        when PERM_ENTRY
+          "file"
+        else
+          "unknown"
+        end
+      end
 
       def _set_status(new_status)
         @status = new_status

@@ -30,6 +30,15 @@ module SMPTool
         @n_max_entries = @volume_params[:n_dir_segs] * @volume_params[:n_max_entries_per_dir_seg]
       end
 
+      def snapshot
+        {
+          volume_params: @volume_params,
+          volume_data: @data.snapshot,
+          n_free_clusters: @data.calc_n_free_clusters,
+          n_max_entries: @n_max_entries
+        }
+      end
+
       def to_volume_io
         Utils::ConverterToVolumeIO.new(
           bootloader: @bootloader,

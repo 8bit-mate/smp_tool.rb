@@ -76,12 +76,10 @@ class TestSMPTool < Minitest::Test
       extra_word: 0
     }
 
-    vol = SMPTool::VirtualVolume::Volume.new(
+    SMPTool::VirtualVolume::Volume.new(
       bootloader: SMPTool::Basic10::DEFAULT_BOOTLOADER,
       home_block: SMPTool::Basic10::HOME_BLOCK,
       volume_params: test_params
     )
-
-    vol.inspect
   end
 end
