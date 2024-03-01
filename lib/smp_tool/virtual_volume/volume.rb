@@ -34,6 +34,10 @@ module SMPTool
         ).call
       end
 
+      def to_binary_s
+        to_volume_io.to_binary_s
+      end
+
       #
       # Allocate more clusters to the volume.
       #
