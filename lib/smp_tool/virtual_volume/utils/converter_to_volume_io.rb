@@ -8,11 +8,13 @@ module SMPTool
       #
       class ConverterToVolumeIO
         def initialize(
-          volume_params,
-          volume_data
+          bootloader:,
+          home_block:,
+          volume_params:,
+          volume_data:
         )
-          @bootloader = volume_params[:bootloader]
-          @home_block = volume_params[:home_block]
+          @bootloader = bootloader
+          @home_block = home_block
           @n_clusters_allocated = volume_params[:n_clusters_allocated]
           @n_extra_bytes_per_entry = volume_params[:n_extra_bytes_per_entry]
           @n_clusters_per_dir_seg = volume_params[:n_clusters_per_dir_seg]

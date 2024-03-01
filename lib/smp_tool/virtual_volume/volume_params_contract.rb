@@ -8,18 +8,7 @@ module SMPTool
     class VolumeParamsContract < Dry::Validation::Contract
       config.messages.default_locale = :en
 
-      # rubocop:disable Metrics/BlockLength
       json do
-        required(:bootloader).value(
-          :array,
-          max_size?: CLUSTER_SIZE
-        )
-
-        required(:home_block).value(
-          :array,
-          max_size?: CLUSTER_SIZE
-        )
-
         required(:n_clusters_allocated).value(
           :integer,
           lteq?: N_CLUSTERS_MAX
@@ -46,7 +35,6 @@ module SMPTool
           :integer
         )
       end
-      # rubocop:enable Metrics/BlockLength
 
       rule(:n_dir_segs, :n_clusters_per_dir_seg) do
         msg = "Can't use :n_dir_segs => #{values[:n_dir_segs]}" \

@@ -16,7 +16,10 @@ module SMPTool
         Utils::ConverterFromVolumeIO.read_io(volume_io)
       end
 
-      def initialize(volume_params:, volume_data: nil)
+      def initialize(bootloader:, home_block:, volume_params:, volume_data: nil)
+        @bootloader = bootloader
+        @home_block = home_block
+
         @volume_params = Utils::VolumeParamsValidator.call(volume_params)
         @extra_word = volume_params[:extra_word]
         @data = volume_data || _init_empty_volume_data
@@ -29,8 +32,10 @@ module SMPTool
 
       def to_volume_io
         Utils::ConverterToVolumeIO.new(
-          @volume_params,
-          @data
+          bootloader: @bootloader,
+          home_block: @home_block,
+          volume_params: @volume_params,
+          volume_data: @data
         ).call
       end
 
@@ -173,6 +178,7 @@ module SMPTool
           @extra_word,
           &block
         )
+
         @data.f_push(file)
 
         @data.squeeze
