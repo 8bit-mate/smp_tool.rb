@@ -55,7 +55,16 @@ class TestSMPTool < Minitest::Test
 
     vol.trim
 
-    p vol.inspect
+    vol.inspect
+  end
+
+  def test_push_file
+    io = read_bin_file("./data/read/basic_10/standard_vol_bas_10.bin")
+    vol = SMPTool::VirtualVolume::Volume.read_io(io)
+
+    vol.f_push(
+      { filename: "test.bas", data: ["10 REM test"] }
+    )
   end
 
   def test_init_new_volume

@@ -126,12 +126,12 @@ module SMPTool
       def _f_push(file, idx)
         n_clusters_left = self[idx].n_clusters - file.n_clusters
 
-        insert(-idx, file)
+        insert(idx, file)
         delete_at(idx + 1)
 
         return if n_clusters_left.zero?
 
-        insert(idx, _new_empty_entry(n_clusters_left))
+        insert(-idx, _new_empty_entry(n_clusters_left))
       end
 
       def _free_entry_header_params(n_clusters)

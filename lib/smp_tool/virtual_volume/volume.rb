@@ -47,7 +47,7 @@ module SMPTool
         return self unless n_add_clusters.positive?
 
         if n_add_clusters + @volume_params[:n_clusters_allocated] > N_CLUSTERS_MAX
-          raise ArgumentError, "Can't allocate more than #{N_CLUSTERS_MAX} clusters"
+          raise ArgumentError, "Volume size can't be more than #{N_CLUSTERS_MAX} clusters"
         end
 
         @volume_params[:n_clusters_allocated] += n_add_clusters
@@ -175,7 +175,7 @@ module SMPTool
         )
         @data.f_push(file)
 
-        squeeze
+        @data.squeeze
       end
 
       def _f_extract(*filenames)
