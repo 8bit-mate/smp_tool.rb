@@ -12,7 +12,7 @@ module SMPTool
         uint8
       end
 
-      # string :padding, length: -> { CLUSTER_SIZE - padding.rel_offset }, pad_byte: PAD_BYTE
+      string :padding, length: -> { CLUSTER_SIZE - padding.rel_offset }, pad_byte: PAD_BYTE
     end
   end
 end
