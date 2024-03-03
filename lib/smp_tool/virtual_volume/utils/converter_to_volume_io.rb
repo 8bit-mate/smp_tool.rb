@@ -21,7 +21,8 @@ module SMPTool
           @n_max_entries_per_dir_seg = volume_params[:n_max_entries_per_dir_seg]
           @n_dir_segs = volume_params[:n_dir_segs]
 
-          @data = _group_entries(volume_data, @n_max_entries_per_dir_seg)
+          # @data = _group_entries(volume_data, @n_max_entries_per_dir_seg)
+          @data = _group_entries(volume_data)
 
           @data_offset = N_SYS_CLUSTERS + @n_dir_segs * @n_clusters_per_dir_seg
         end
@@ -46,13 +47,11 @@ module SMPTool
           end
         end
 
-        def _group_entries(array, group_size)
-          groups = (array.length / group_size.to_f).ceil
-
-          (1..groups).map do |group|
-            start_index = (group - 1) * group_size
-            array.slice(start_index, group_size)
-          end
+        def _group_entries(arr)
+          result = arr.each_slice(@n_max_entries_per_dir_seg).to_a
+          diff = @n_dir_segs - result.length
+          diff.times { result << [] }
+          result
         end
 
         def _init_bootloader

@@ -71,7 +71,7 @@ class TestSMPTool < Minitest::Test
     test_params = {
       n_clusters_allocated: 20,
       n_extra_bytes_per_entry: 0,
-      n_dir_segs: 1,
+      n_dir_segs: 2,
       n_clusters_per_dir_seg: 2,
       extra_word: 0
     }
@@ -80,6 +80,6 @@ class TestSMPTool < Minitest::Test
       bootloader: SMPTool::Basic10::DEFAULT_BOOTLOADER,
       home_block: SMPTool::Basic10::HOME_BLOCK,
       volume_params: test_params
-    )
+    ).to_binary_s
   end
 end
