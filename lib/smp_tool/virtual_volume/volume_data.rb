@@ -108,12 +108,17 @@ module SMPTool
         self
       end
 
-      def trim
+      def trim(n_clusters)
         n_free_clusters = calc_n_free_clusters
+        diff = n_free_clusters - n_clusters
+
+        raise ArgumentError, "Can't trim more than #{n_free_clusters} clusters" if diff.negative?
+        raise ArgumentError, "Should keep at least one empty entry" if reject(&:empty_entry?).empty?
 
         reject!(&:empty_entry?)
+        push_empty_entry(diff)
 
-        n_free_clusters
+        self
       end
 
       private

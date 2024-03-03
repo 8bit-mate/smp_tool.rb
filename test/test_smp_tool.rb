@@ -53,7 +53,7 @@ class TestSMPTool < Minitest::Test
 
     vol.add_clusters(1)
 
-    vol.trim
+    vol.trim(1)
 
     vol.inspect
   end

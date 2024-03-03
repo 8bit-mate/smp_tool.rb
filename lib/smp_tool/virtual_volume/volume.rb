@@ -72,10 +72,11 @@ module SMPTool
       end
 
       #
-      # Drop all free clusters.
+      # Trim free clusters.
       #
-      def trim
-        @volume_params[:n_clusters_allocated] -= @data.trim
+      def trim(n_clusters)
+        @data.trim(n_clusters)
+        @volume_params[:n_clusters_allocated] -= n_clusters
 
         self
       end
