@@ -113,7 +113,7 @@ module SMPTool
         diff = n_free_clusters - n_clusters
 
         raise ArgumentError, "Can't trim more than #{n_free_clusters} clusters" if diff.negative?
-        raise ArgumentError, "Should keep at least one empty entry" if reject(&:empty_entry?).empty?
+        raise ArgumentError, "Should keep at least one empty entry" if reject(&:empty_entry?).empty? && diff < 1
 
         reject!(&:empty_entry?)
         push_empty_entry(diff)
