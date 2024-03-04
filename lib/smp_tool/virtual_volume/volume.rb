@@ -55,30 +55,16 @@ module SMPTool
       #
       # Allocate more clusters to the volume.
       #
-      def add_clusters(n_add_clusters)
-        _check_dir_overflow
+      def change_size(n_clusters)
+        if n_clusters.positive?
+          _check_dir_overflow
 
-        return self unless n_add_clusters.positive?
-
-        if n_add_clusters + @volume_params[:n_clusters_allocated] > N_CLUSTERS_MAX
-          raise ArgumentError, "Volume size can't be more than #{N_CLUSTERS_MAX} clusters"
+          if n_clusters + @volume_params[:n_clusters_allocated] > N_CLUSTERS_MAX
+            raise ArgumentError, "Volume size can't be more than #{N_CLUSTERS_MAX} clusters"
+          end
         end
 
-        @volume_params[:n_clusters_allocated] += n_add_clusters
-
-        @data.push_empty_entry(n_add_clusters)
-
-        self
-      end
-
-      #
-      # Trim free clusters.
-      #
-      def trim(n_clusters)
-        @data.trim(n_clusters)
-        @volume_params[:n_clusters_allocated] -= n_clusters
-
-        self
+        _change_size(n_clusters)
       end
 
       #
@@ -158,8 +144,15 @@ module SMPTool
 
       private
 
+      def _change_size(n_clusters)
+        @data.change_size(n_clusters)
+        @volume_params[:n_clusters_allocated] += n_clusters
+
+        self
+      end
+
       def _check_dir_overflow
-        raise ArgumentError, "Directory table is full." if @data.length == @n_max_entries
+        raise ArgumentError, "Directory table is full." if @data.length >= @n_max_entries
       end
 
       def _calc_n_max_entries_per_dir_seg
