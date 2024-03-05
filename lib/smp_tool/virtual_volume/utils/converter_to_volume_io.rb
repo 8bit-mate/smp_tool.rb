@@ -21,7 +21,6 @@ module SMPTool
           @n_max_entries_per_dir_seg = volume_params[:n_max_entries_per_dir_seg]
           @n_dir_segs = volume_params[:n_dir_segs]
 
-          # @data = _group_entries(volume_data, @n_max_entries_per_dir_seg)
           @data = _group_entries(volume_data)
 
           @data_offset = N_SYS_CLUSTERS + @n_dir_segs * @n_clusters_per_dir_seg

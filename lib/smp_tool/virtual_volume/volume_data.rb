@@ -31,13 +31,11 @@ module SMPTool
       #   - File `old_id` not found.
       #
       def f_rename(old_id, new_id)
-        if _already_exists?(new_id)
-          raise ArgumentError, "Can't rename file: file '#{new_id.print_ascii}' already exists on the volume"
-        end
+        _raise_already_exists(new_id.print_ascii) if _already_exists?(new_id)
 
-        idx = _find_idx(old_id)
+        idx = _find_idx(old_id.radix50)
 
-        _raise_file_not_found(old_id) unless idx
+        _raise_file_not_found(old_id.print_ascii) unless idx
 
         self[idx].rename(new_id.radix50)
 
@@ -52,12 +50,12 @@ module SMPTool
       # @return [VolumeData] self
       #
       # @raise [ArgumentError]
-      #   - File `file_id` not found.
+      #   - File with `file_id` not found.
       #
       def f_delete(file_id)
-        idx = _find_idx(file_id)
+        idx = _find_idx(file_id.radix50)
 
-        _raise_file_not_found(file_id) unless idx
+        _raise_file_not_found(file_id.print_ascii) unless idx
 
         self[idx].clean
 
@@ -66,6 +64,8 @@ module SMPTool
 
       #
       # Consolidate all free space at the end of the volume.
+      #
+      # @return [VolumeData] self
       #
       def squeeze
         n_free_clusters = calc_n_free_clusters
@@ -79,6 +79,11 @@ module SMPTool
         self
       end
 
+      #
+      # Calculate total number of free clusters.
+      #
+      # @return [Integer]
+      #
       def calc_n_free_clusters
         self.select(&:empty_entry?)
             .sum(&:n_clusters)
@@ -87,7 +92,13 @@ module SMPTool
       #
       # Append a file.
       #
+      # @param [SMPTool::VirtualVolume::DataEntry] file
+      #
+      # @return [VolumeData] self
+      #
       def f_push(file)
+        _raise_already_exists(file.ascii_filename) if _already_exists?(file.filename)
+
         # We're starting from the end of the array, since free space tend to locate
         # at the end of the volume (esp. after the 'squeeze' command).
         idx = index(reverse_each.detect { |e| e.n_clusters >= file.n_clusters && e.empty_entry? })
@@ -154,17 +165,29 @@ module SMPTool
         }
       end
 
-      def _raise_file_not_found(file_id)
-        raise ArgumentError, "File '#{file_id.print_ascii}' not found on the volume"
+      def _raise_file_not_found(str)
+        raise ArgumentError, "File '#{str}' not found on the volume"
       end
 
+      def _raise_already_exists(str)
+        raise ArgumentError, "File '#{str}' already exists on the volume."
+      end
+
+      #
+      # Check if file with radix-50 filename `file_id` already exists.
+      #
+      # @param [Array<Integer>] file_id
+      #   RADIX-50 filename.
+      #
+      # @return [Boolean]
+      #
       def _already_exists?(file_id)
         idx = _find_idx(file_id)
         idx.nil? ? false : true
       end
 
       def _find_idx(file_id)
-        find_index { |e| e.filename == file_id.radix50 }
+        find_index { |e| e.filename == file_id }
       end
     end
   end

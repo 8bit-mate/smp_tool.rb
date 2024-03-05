@@ -9,7 +9,7 @@ module SMPTool
       extend Forwardable
 
       def_delegators :@header, :status, :filename, :n_clusters, :ch_job, :date, :extra_word,
-                     :rename, :permanent_entry?, :empty_entry?, :snapshot
+                     :rename, :permanent_entry?, :empty_entry?, :snapshot, :ascii_filename
 
       attr_reader :header, :data
 

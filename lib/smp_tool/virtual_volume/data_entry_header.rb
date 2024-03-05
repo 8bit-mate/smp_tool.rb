@@ -6,21 +6,25 @@ module SMPTool
     # Header of a 'virtual' data entry.
     #
     class DataEntryHeader
-      attr_reader :status, :n_clusters, :ch_job, :date, :extra_word
+      attr_reader :filename, :status, :n_clusters, :ch_job, :date, :extra_word
 
       def initialize(params)
         @status = params[:status]
-        @filename = Filename.new(radix50: params[:filename])
+        @filename = params[:filename]
         @n_clusters = params[:n_clusters]
         @ch_job = params[:ch_job]
         @date = params[:date]
         @extra_word = params[:extra_word] || Basic10::ENTRY_EXTRA_WORD
       end
 
+      def ascii_filename
+        Filename.new(radix50: @filename).print_ascii
+      end
+
       def snapshot
         {
           status: _status_snapshot,
-          filename: @filename.print_ascii,
+          filename: ascii_filename,
           n_clusters: @n_clusters,
           ch_job: @ch_job,
           date: @date,
@@ -30,10 +34,6 @@ module SMPTool
 
       def resize(new_size)
         @n_clusters = new_size
-      end
-
-      def filename
-        @filename.radix50
       end
 
       def permanent_entry?
@@ -55,15 +55,13 @@ module SMPTool
       def clean
         make_empty
 
-        _new_filename(
+        rename(
           [PAD_WORD, PAD_WORD, PAD_WORD]
         )
       end
 
       def rename(new_radix_id)
-        _new_filename(
-          new_radix_id
-        )
+        @filename = new_radix_id
       end
 
       private
@@ -81,14 +79,6 @@ module SMPTool
 
       def _set_status(new_status)
         @status = new_status
-
-        self
-      end
-
-      def _new_filename(radix50_id)
-        @filename = Filename.new(radix50: radix50_id)
-
-        self
       end
     end
   end
