@@ -119,11 +119,10 @@ module SMPTool
         self
       end
 
-      def change_size(n_clusters)
+      def resize(n_clusters)
         n_free_clusters = calc_n_free_clusters
         diff = n_free_clusters + n_clusters
 
-        raise ArgumentError, "Can't trim more than #{n_free_clusters} clusters" if diff.negative?
         raise ArgumentError, "Should keep at least one empty entry" if reject(&:empty_entry?).empty? && diff < 1
 
         reject!(&:empty_entry?)
@@ -166,7 +165,7 @@ module SMPTool
       end
 
       def _raise_file_not_found(str)
-        raise ArgumentError, "File '#{str}' not found on the volume"
+        raise ArgumentError, "File '#{str}' not found on the volume."
       end
 
       def _raise_already_exists(str)

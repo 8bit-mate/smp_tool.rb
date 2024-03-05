@@ -51,9 +51,9 @@ class TestSMPTool < Minitest::Test
     io = read_bin_file("./data/read/basic_10/micro_bas_10.bin")
     vol = SMPTool::VirtualVolume::Volume.read_io(io)
 
-    vol.change_size(1)
+    vol.resize(1)
 
-    vol.change_size(-1)
+    vol.resize(-1)
 
     vol.inspect
   end

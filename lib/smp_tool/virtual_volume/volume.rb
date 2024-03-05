@@ -55,16 +55,18 @@ module SMPTool
       #
       # Allocate more clusters to the volume.
       #
-      def change_size(n_clusters)
+      def resize(n_clusters)
         if n_clusters.positive?
-          _check_dir_overflow
-
-          if n_clusters + @volume_params[:n_clusters_allocated] > N_CLUSTERS_MAX
-            raise ArgumentError, "Volume size can't be more than #{N_CLUSTERS_MAX} clusters"
-          end
+          _resize_check_pos_input(n_clusters)
+        elsif n_clusters.negative?
+          _resize_check_neg_input(n_clusters)
+        else
+          return self
         end
 
-        _change_size(n_clusters)
+        _resize(n_clusters)
+
+        self
       end
 
       #
@@ -144,8 +146,24 @@ module SMPTool
 
       private
 
-      def _change_size(n_clusters)
-        @data.change_size(n_clusters)
+      def _resize_check_pos_input(n_clusters)
+        _check_dir_overflow
+
+        return unless n_clusters + @volume_params[:n_clusters_allocated] > N_CLUSTERS_MAX
+
+        raise ArgumentError, "Volume size can't be more than #{N_CLUSTERS_MAX} clusters"
+      end
+
+      def _resize_check_neg_input(n_clusters)
+        n_free_clusters = @data.calc_n_free_clusters
+
+        return unless n_clusters > n_free_clusters
+
+        raise ArgumentError, "Can't trim more than #{n_free_clusters} clusters" if diff.negative?
+      end
+
+      def _resize(n_clusters)
+        @data.resize(n_clusters)
         @volume_params[:n_clusters_allocated] += n_clusters
 
         self
