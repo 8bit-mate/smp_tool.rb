@@ -194,11 +194,11 @@ module SMPTool
       def _f_push(f_hash, &block)
         _check_dir_overflow
 
-        file = SMPTool::VirtualVolume::Utils::FileConverter.hash_to_data_entry(
+        file = SMPTool::VirtualVolume::Utils::FileConverter.new(
           f_hash,
           @extra_word,
           &block
-        )
+        ).call
 
         @data.f_push(file)
 
