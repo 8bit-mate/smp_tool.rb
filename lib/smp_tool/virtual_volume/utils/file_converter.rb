@@ -14,7 +14,7 @@ module SMPTool
             (str.length.to_f / CLUSTER_SIZE).ceil
           end
 
-          def _make_header(ascii_filename, n_clusters, extra_word)
+          def _make_header(ascii_filename:, n_clusters:, extra_word:)
             {
               status: PERM_ENTRY,
               filename: Filename.new(ascii: ascii_filename).radix50,
@@ -44,7 +44,11 @@ module SMPTool
         def self.hash_to_data_entry(f_hash, extra_word, &block)
           data = _make_data(f_hash[:data], &block)
 
-          header_params = _make_header(f_hash[:filename], _calc_n_clusters(data), extra_word)
+          header_params = _make_header(
+            ascii_filename: f_hash[:filename],
+            n_clusters: _calc_n_clusters(data),
+            extra_word: extra_word
+          )
 
           DataEntry.new(
             header: DataEntryHeader.new(header_params),
