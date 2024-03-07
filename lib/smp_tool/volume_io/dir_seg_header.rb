@@ -7,7 +7,7 @@ module SMPTool
     #
     # Notes:
     # - word #4 should be set to 0x0000 for the BASIC v.1.0, 0x0002 for the BASIC v.2.0.
-    # - word #5 allows to skip sector 0x0600 - 0x0800.
+    # - word #5 allows to use only one cluster for the entire directory.
     #
     class DirSegHeader < BinData::Record
       endian :little

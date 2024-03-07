@@ -3,11 +3,9 @@
 module SMPTool
   module VirtualVolume
     #
-    # Simplified Ruby representation of the volume.
+    # Ruby representation of the volume.
     #
     class Volume
-      attr_reader :data
-
       def self.read_volume_io(volume_io)
         Utils::ConverterFromVolumeIO.read_volume_io(volume_io)
       end
@@ -21,8 +19,7 @@ module SMPTool
         @home_block = home_block
 
         @volume_params = Utils::VolumeParamsValidator.call(volume_params)
-        @extra_word = volume_params[:extra_word]
-        @data = volume_data || _init_empty_volume_data
+        @data = volume_data || Utils::EmptyVolDataInitializer.call(@volume_params)
 
         @volume_params[:n_max_entries_per_dir_seg] =
           volume_params[:n_max_entries_per_dir_seg] || _calc_n_max_entries_per_dir_seg
@@ -39,6 +36,11 @@ module SMPTool
         }
       end
 
+      #
+      # Convert `self` to a VolumeIO object.
+      #
+      # @return [VolumeIO]
+      #
       def to_volume_io
         Utils::ConverterToVolumeIO.new(
           bootloader: @bootloader,
@@ -48,12 +50,23 @@ module SMPTool
         ).call
       end
 
+      #
+      # Convert `self` to a binary string. Write this string to a binary file
+      # to get a MK90 volume that works on an emulator or on a real machine.
+      #
+      # @return [String]
+      #
       def to_binary_s
         to_volume_io.to_binary_s
       end
 
       #
-      # Allocate more clusters to the volume.
+      # Allocate more clusters to the volume or trim free clusters.
+      #
+      # @param [Integer] n_clusters
+      #   Number of clusters to add (pos. int.) or to trim (neg. int.)
+      #
+      # @return [Volume] self
       #
       def resize(n_clusters)
         if n_clusters.positive?
@@ -70,7 +83,16 @@ module SMPTool
       end
 
       #
-      # Push file(s) to the volume.
+      # Push an arr. of files to the volume.
+      #
+      # @param [FileInterface, Hash{ Symbol => Object }] *files
+      #
+      # @yield [str]
+      #   Each line of a file gets passed through this block. The default block encodes
+      #   a string from the UTF-8 to the KOI-7, but a custom block allows to alter this
+      #   behavior (e.g. when the files are already in the KOI-7 encoding).
+      #
+      # @return [VirtualVolume] self
       #
       def f_push(*files, &block)
         block = ->(str) { InjalidDejice.utf_to_koi(str, forced_latin: "\"") } unless block_given?
@@ -83,31 +105,61 @@ module SMPTool
       end
 
       #
-      # Extract file(s) by the ASCII filename.
+      # Extract content of a file as an array of strings.
       #
       # @param [<String>] *ascii_ids
       #   ASCII filenames.
       #
-      # @return [<Type>] <description>
+      # @yield [str]
+      #   Each line of a file gets passed through this block. The default block decodes
+      #   a string from the KOI-7 to the UTF-8, but a custom block allows to alter this
+      #   behavior.
       #
-      def f_extract(*ascii_ids)
-        filenames = *ascii_ids.map { |id| Filename.new(ascii: id) }
+      # @return [Array<FileInterface>]
+      #
+      def f_extract_txt(*ascii_ids, &block)
+        block = ->(str) { InjalidDejice.koi_to_utf(str) } unless block_given?
 
-        _f_extract(*filenames)
+        Utils::FileExtracter.new(@data).f_extract_txt(
+          _map_filenames(ascii_ids),
+          &block
+        )
       end
 
       #
-      # Extract all files.
+      # Extract all files as arrays of strings.
       #
-      def f_extract_all
-        filenames = @data.reject { |e| e.status == EMPTY_ENTRY }
-                         .map { |e| Filename.new(radix50: e.filename) }
-
-        _f_extract(*filenames)
+      # @return [Array<FileInterface>]
+      #
+      def f_extract_txt_all
+        f_extract_txt(*_all_filenames)
       end
 
       #
-      # Rename file.
+      # Extract content of a file as a 'raw' string (as is).
+      #
+      # @param [<String>] *ascii_ids
+      #   ASCII filenames.
+      #
+      # @return [Array<FileInterface>]
+      #
+      def f_extract_raw(*ascii_ids)
+        Utils::FileExtracter.new(@data).f_extract_raw(
+          _map_filenames(ascii_ids)
+        )
+      end
+
+      #
+      # Extract all files as 'raw' strings.
+      #
+      # @return [Array<FileInterface>]
+      #
+      def f_extract_raw_all
+        f_extract_raw(*_all_filenames)
+      end
+
+      #
+      # Rename a file.
       #
       # @param [<String>] old_filename
       # @param [<String>] new_filename
@@ -124,7 +176,7 @@ module SMPTool
       end
 
       #
-      # Delete file.
+      # Delete a file.
       #
       # @param [<String>] filename
       #
@@ -133,11 +185,14 @@ module SMPTool
       def f_delete(filename)
         @data.f_delete(Filename.new(ascii: filename))
 
-        squeeze
-
         self
       end
 
+      #
+      # Consolidate all free space at the end ot the volume.
+      #
+      # @return [Volume] self
+      #
       def squeeze
         @data.squeeze
 
@@ -145,6 +200,15 @@ module SMPTool
       end
 
       private
+
+      def _map_filenames(arr)
+        arr.map { |id| Filename.new(ascii: id) }
+      end
+
+      def _all_filenames
+        @data.reject { |e| e.status == EMPTY_ENTRY }
+             .map { |e| e.header.ascii_filename }
+      end
 
       def _resize_check_pos_input(n_clusters)
         _check_dir_overflow
@@ -178,35 +242,18 @@ module SMPTool
         (((@volume_params[:n_clusters_per_dir_seg] * CLUSTER_SIZE) - HEADER_SIZE - FOOTER_SIZE) / entry_size).floor
       end
 
-      def _init_empty_volume_data
-        n_data_clusters = @volume_params[:n_clusters_allocated] -
-                          N_SYS_CLUSTERS -
-                          (@volume_params[:n_dir_segs] * @volume_params[:n_clusters_per_dir_seg])
-
-        data = VolumeData.new(
-          [],
-          @volume_params[:extra_word]
-        )
-
-        data.push_empty_entry(n_data_clusters)
-      end
-
       def _f_push(f_hash, &block)
         _check_dir_overflow
 
         file = SMPTool::VirtualVolume::Utils::FileConverter.new(
           f_hash,
-          @extra_word,
+          @volume_params[:extra_word],
           &block
         ).call
 
         @data.f_push(file)
 
         @data.squeeze
-      end
-
-      def _f_extract(*filenames)
-        Utils::FileExtracter.new(@data).f_extract(*filenames)
       end
     end
   end

@@ -58,13 +58,19 @@ class TestSMPTool < Minitest::Test
     vol.inspect
   end
 
-  def test_push_file
+  def test_push_and_extract_file
     io = read_bin_file("./data/read/basic_10/standard_vol_bas_10.bin")
     vol = SMPTool::VirtualVolume::Volume.read_io(io)
 
+    orig_data = ["10 REM тест", "20 PRINT \"конец\""]
+
     vol.f_push(
-      { filename: "test.bas", data: ["10 REM test"] }
+      { filename: "test.bas", data: orig_data }
     )
+
+    extr_data = vol.f_extract_txt("test.bas").first[:data]
+
+    assert_equal orig_data, extr_data
   end
 
   def test_init_new_volume

@@ -3,7 +3,7 @@
 module SMPTool
   module VirtualVolume
     #
-    # Provides additional features for the Volume#data.
+    # Provides set of methods to work with volume's data.
     #
     class VolumeData < SimpleDelegator
       def initialize(obj, extra_word)
@@ -164,16 +164,16 @@ module SMPTool
         }
       end
 
-      def _raise_file_not_found(str)
-        raise ArgumentError, "File '#{str}' not found on the volume."
+      def _raise_file_not_found(filename)
+        raise ArgumentError, "File '#{filename}' not found on the volume."
       end
 
-      def _raise_already_exists(str)
-        raise ArgumentError, "File '#{str}' already exists on the volume."
+      def _raise_already_exists(filename)
+        raise ArgumentError, "File '#{filename}' already exists on the volume."
       end
 
       #
-      # Check if file with radix-50 filename `file_id` already exists.
+      # Check if file with the Radix-50 filename `file_id` already exists.
       #
       # @param [Array<Integer>] file_id
       #   RADIX-50 filename.
@@ -185,6 +185,14 @@ module SMPTool
         idx.nil? ? false : true
       end
 
+      #
+      # Find index of a file with the Radix-50 filename `file_id`.
+      #
+      # @param [Array<Integer>] file_id
+      #   RADIX-50 filename.
+      #
+      # @return [Integer, nil]
+      #
       def _find_idx(file_id)
         find_index { |e| e.filename == file_id }
       end

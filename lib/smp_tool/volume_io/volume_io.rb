@@ -9,7 +9,7 @@ require_relative "data"
 module SMPTool
   module VolumeIO
     #
-    # Full volume.
+    # MK90 BASIC volume.
     #
     class VolumeIO < BinData::Record
       hide :bootloader

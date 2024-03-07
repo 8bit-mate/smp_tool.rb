@@ -2,7 +2,9 @@
 
 module SMPTool
   #
-  # Handles volume input - output.
+  # Namespace for the classes that handle volume IO operations,
+  # e.g. reading/parsing volume from a 'raw' binary string, and
+  # writing it back to a binary string.
   #
   module VolumeIO; end
 end
