@@ -191,7 +191,8 @@ module SMPTool
       #
       # Consolidate all free space at the end ot the volume.
       #
-      # @return [Volume] self
+      # @return [Integer] n_free_clusters
+      #   Number of free clusters that were joined.
       #
       def squeeze
         @data.squeeze
@@ -229,8 +230,6 @@ module SMPTool
       def _resize(n_clusters)
         @data.resize(n_clusters)
         @volume_params[:n_clusters_allocated] += n_clusters
-
-        self
       end
 
       def _check_dir_overflow

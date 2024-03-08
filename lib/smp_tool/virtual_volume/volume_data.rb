@@ -31,7 +31,7 @@ module SMPTool
       #   - File `old_id` not found.
       #
       def f_rename(old_id, new_id)
-        _raise_already_exists(new_id.print_ascii) if _already_exists?(new_id)
+        _raise_already_exists(new_id.print_ascii) if _already_exists?(new_id.radix50)
 
         idx = _find_idx(old_id.radix50)
 
@@ -169,7 +169,7 @@ module SMPTool
       end
 
       def _raise_already_exists(filename)
-        raise ArgumentError, "File '#{filename}' already exists on the volume."
+        raise ArgumentError, "File with the filename '#{filename}' already exists on the volume."
       end
 
       #
