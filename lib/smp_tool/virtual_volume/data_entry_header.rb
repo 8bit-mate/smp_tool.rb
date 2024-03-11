@@ -17,14 +17,14 @@ module SMPTool
         @extra_word = params[:extra_word] || Basic10::ENTRY_EXTRA_WORD
       end
 
-      def ascii_filename
+      def print_ascii_filename
         Filename.new(radix50: @filename).print_ascii
       end
 
       def snapshot
         {
           status: _status_snapshot,
-          filename: ascii_filename,
+          filename: print_ascii_filename,
           n_clusters: @n_clusters,
           ch_job: @ch_job,
           date: @date,

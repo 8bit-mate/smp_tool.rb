@@ -84,23 +84,20 @@ module SMPTool
       #
       # Push an arr. of files to the volume.
       #
-      # @param [FileInterface, Hash{ Symbol => Object }] *files
+      # @param [FileInterface, Hash{ Symbol => Object }] file_obj
       #
       # @yield [str]
       #   Each line of a file gets passed through this block. The default block encodes
       #   a string from the UTF-8 to the KOI-7, but a custom block allows to alter this
-      #   behavior (e.g. when the files are already in the KOI-7 encoding).
+      #   behavior (e.g. when the file is already in the KOI-7 encoding).
       #
-      # @return [VirtualVolume] self
+      # @return [String]
+      #   ASCII filename of the pushed file.
       #
-      def f_push(*files, &block)
+      def f_push(file_obj, &block)
         block = ->(str) { InjalidDejice.utf_to_koi(str, forced_latin: "\"") } unless block_given?
 
-        files.each do |f|
-          _f_push(f, &block)
-        end
-
-        self
+        _f_push(file_obj, &block)
       end
 
       #
@@ -203,7 +200,7 @@ module SMPTool
 
       def _all_filenames
         @data.reject { |e| e.status == EMPTY_ENTRY }
-             .map { |e| e.header.ascii_filename }
+             .map { |e| e.header.print_ascii_filename }
       end
 
       def _resize_check_pos_input(n_clusters)
@@ -237,6 +234,8 @@ module SMPTool
       end
 
       def _f_push(f_hash, &block)
+        @data.squeeze
+
         _check_dir_overflow
 
         file = SMPTool::VirtualVolume::Utils::FileConverter.new(
@@ -246,8 +245,6 @@ module SMPTool
         ).call
 
         @data.f_push(file)
-
-        @data.squeeze
       end
     end
   end

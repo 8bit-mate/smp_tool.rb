@@ -97,10 +97,11 @@ module SMPTool
       #
       # @param [SMPTool::VirtualVolume::DataEntry] file
       #
-      # @return [VolumeData] self
+      # @return [String] file.print_ascii_filename
+      #   ASCII filename of the pushed file.
       #
       def f_push(file)
-        _raise_already_exists(file.ascii_filename) if _already_exists?(file.filename)
+        _raise_already_exists(file.print_ascii_filename) if _already_exists?(file.filename)
 
         # We're starting from the end of the array, since free space tend to locate
         # at the end of the volume (esp. after the 'squeeze' command).
@@ -113,7 +114,7 @@ module SMPTool
 
         _f_push(file, idx)
 
-        self
+        file.print_ascii_filename
       end
 
       def push_empty_entry(n_free_clusters)
