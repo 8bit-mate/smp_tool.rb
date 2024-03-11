@@ -3,7 +3,7 @@
 module SMPTool
   module VirtualVolume
     #
-    # Utils to manipulate the virtual volume.
+    # Namespace for utils to manipulate the virtual volume.
     #
     module Utils; end
   end

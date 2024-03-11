@@ -64,9 +64,10 @@ module SMPTool
       # Allocate more clusters to the volume or trim free clusters.
       #
       # @param [Integer] n_clusters
-      #   Number of clusters to add (pos. int.) or to trim (neg. int.)
+      #   Number of clusters to add (pos. int.) or to trim (neg. int.).
       #
-      # @return [Volume] self
+      # @return [Integer]
+      #   Number of clusters that were added/trimmed.
       #
       def resize(n_clusters)
         if n_clusters.positive?
@@ -74,12 +75,10 @@ module SMPTool
         elsif n_clusters.negative?
           _resize_check_neg_input(n_clusters)
         else
-          return self
+          return n_clusters
         end
 
         _resize(n_clusters)
-
-        self
       end
 
       #
@@ -224,8 +223,8 @@ module SMPTool
       end
 
       def _resize(n_clusters)
-        @data.resize(n_clusters)
         @volume_params[:n_clusters_allocated] += n_clusters
+        @data.resize(n_clusters)
       end
 
       def _check_dir_overflow

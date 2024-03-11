@@ -122,16 +122,27 @@ module SMPTool
         self
       end
 
+      #
+      # <Description>
+      #
+      # @param [Integer] n_clusters
+      #   Number of clusters to add (pos. int.) or to trim (neg. int.).
+      #
+      # @return [Integer]
+      #   Number of clusters that were added/trimmed.
+      #
       def resize(n_clusters)
         n_free_clusters = calc_n_free_clusters
         diff = n_free_clusters + n_clusters
 
-        raise ArgumentError, "Should keep at least one empty entry" if reject(&:empty_entry?).empty? && diff < 1
+        if reject(&:empty_entry?).empty? && diff < 1
+          raise ArgumentError, "Can't trim: volume should keep at least one empty/file entry"
+        end
 
         reject!(&:empty_entry?)
-        push_empty_entry(diff)
+        push_empty_entry(diff) unless diff.zero?
 
-        self
+        diff
       end
 
       private
