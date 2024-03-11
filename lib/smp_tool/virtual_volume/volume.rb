@@ -103,21 +103,21 @@ module SMPTool
       #
       # Extract content of a file as an array of strings.
       #
-      # @param [<String>] *ascii_ids
-      #   ASCII filenames.
+      # @param [<String>] filename
+      #   ASCII filename.
       #
       # @yield [str]
       #   Each line of a file gets passed through this block. The default block decodes
       #   a string from the KOI-7 to the UTF-8, but a custom block allows to alter this
       #   behavior.
       #
-      # @return [Array<FileInterface>]
+      # @return [FileInterface]
       #
-      def f_extract_txt(*ascii_ids, &block)
+      def f_extract_txt(filename, &block)
         block = ->(str) { InjalidDejice.koi_to_utf(str) } unless block_given?
 
         Utils::FileExtracter.new(@data).f_extract_txt(
-          _map_filenames(ascii_ids),
+          Filename.new(ascii: filename),
           &block
         )
       end
@@ -128,20 +128,20 @@ module SMPTool
       # @return [Array<FileInterface>]
       #
       def f_extract_txt_all
-        f_extract_txt(*_all_filenames)
+        _all_filenames.map { |fn| f_extract_txt(fn) }
       end
 
       #
       # Extract content of a file as a 'raw' string (as is).
       #
-      # @param [<String>] *ascii_ids
-      #   ASCII filenames.
+      # @param [<String>] filename
+      #   ASCII filename.
       #
-      # @return [Array<FileInterface>]
+      # @return [FileInterface]
       #
-      def f_extract_raw(*ascii_ids)
+      def f_extract_raw(filename)
         Utils::FileExtracter.new(@data).f_extract_raw(
-          _map_filenames(ascii_ids)
+          Filename.new(ascii: filename)
         )
       end
 
@@ -151,7 +151,7 @@ module SMPTool
       # @return [Array<FileInterface>]
       #
       def f_extract_raw_all
-        f_extract_raw(*_all_filenames)
+        _all_filenames.map { |fn| f_extract_raw(fn) }
       end
 
       #
@@ -193,10 +193,6 @@ module SMPTool
       end
 
       private
-
-      def _map_filenames(arr)
-        arr.map { |id| Filename.new(ascii: id) }
-      end
 
       def _all_filenames
         @data.reject { |e| e.status == EMPTY_ENTRY }

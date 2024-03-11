@@ -14,32 +14,31 @@ module SMPTool
         #
         # Extract file(s) as is.
         #
-        # @param [Array<Filename>] file_ids
+        # @param [Filename] file_id
         #
-        # @return [Array<FileInterface>]
+        # @return [FileInterface]
         #
-        def f_extract_raw(file_ids)
-          _f_extract(file_ids)
+        def f_extract_raw(file_id)
+          FileInterface.new(
+            filename: file_id.print_ascii,
+            data: _extract_raw_data(file_id)
+          )
         end
 
         #
         # Extract file(s) as array of strings.
         #
-        # @param [Array<Filename>] file_ids
+        # @param [Filename] file_id
         #
         # @yield [str]
         #
-        # @return [Array<FileInterface>]
+        # @return [FileInterface]
         #
-        def f_extract_txt(file_ids, &block)
-          ext_block = lambda { |id|
-            FileInterface.new(
-              filename: id.print_ascii,
-              data: _text_data(id, &block)
-            )
-          }
-
-          _f_extract(file_ids, &ext_block)
+        def f_extract_txt(file_id, &block)
+          FileInterface.new(
+            filename: file_id.print_ascii,
+            data: _text_data(file_id, &block)
+          )
         end
 
         private
@@ -69,31 +68,6 @@ module SMPTool
         #
         def _payload(id)
           _extract_raw_data(id).split(/\x00/).first
-        end
-
-        #
-        # Extract content of each file from the `file_ids`
-        #
-        # @param [Array<Filename>] file_ids
-        #
-        # @yield [str]
-        #   Each line of the file gets passed through this block. The default block
-        #   returns file content as a 'raw' string (as-is). Custom block is used to
-        #   split it to an array of strings, and then proccess each string.
-        #
-        # @return [Array<FileInterface>]
-        #
-        def _f_extract(file_ids, &block)
-          unless block_given?
-            block = lambda { |id|
-              FileInterface.new(
-                filename: id.print_ascii,
-                data: _extract_raw_data(id)
-              )
-            }
-          end
-
-          file_ids.map(&block)
         end
 
         #

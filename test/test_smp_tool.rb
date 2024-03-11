@@ -68,7 +68,7 @@ class TestSMPTool < Minitest::Test
       { filename: "test.bas", data: orig_data }
     )
 
-    extr_data = vol.f_extract_txt("test.bas").first[:data]
+    extr_data = vol.f_extract_txt("test.bas")[:data]
 
     assert_equal orig_data, extr_data
   end
