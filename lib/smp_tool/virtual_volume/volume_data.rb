@@ -128,7 +128,7 @@ module SMPTool
       # @param [Integer] n_clusters
       #   Number of clusters to add (pos. int.) or to trim (neg. int.).
       #
-      # @return [Integer]
+      # @return [Integer] n_clusters
       #   Number of clusters that were added/trimmed.
       #
       def resize(n_clusters)
@@ -142,7 +142,7 @@ module SMPTool
         reject!(&:empty_entry?)
         push_empty_entry(diff) unless diff.zero?
 
-        diff
+        n_clusters
       end
 
       private
