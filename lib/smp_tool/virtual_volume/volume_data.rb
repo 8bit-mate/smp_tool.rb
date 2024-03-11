@@ -23,7 +23,8 @@ module SMPTool
       # @param [SMPTool::Filename] old_id
       # @param [SMPTool::Filename] new_id
       #
-      # @return [VolumeData] self
+      # @return [Array<SMPTool::Filename>]
+      #   Old and new filenames of a renamed file.
       #
       # @raise [ArgumentError]
       #   - Can't assign name `new_id` to the file since another file with
@@ -39,7 +40,7 @@ module SMPTool
 
         self[idx].rename(new_id.radix50)
 
-        self
+        [old_id, new_id]
       end
 
       #
@@ -47,7 +48,8 @@ module SMPTool
       #
       # @param [SMPTool::Filename] file_id
       #
-      # @return [VolumeData] self
+      # @return [SMPTool::Filename]
+      #   Filename of deleted file.
       #
       # @raise [ArgumentError]
       #   - File with `file_id` not found.
@@ -59,24 +61,25 @@ module SMPTool
 
         self[idx].clean
 
-        self
+        file_id
       end
 
       #
       # Consolidate all free space at the end of the volume.
       #
-      # @return [VolumeData] self
+      # @return [Integer] n_free_clusters
+      #   Number of free clusters that were joined.
       #
       def squeeze
         n_free_clusters = calc_n_free_clusters
 
-        return self if n_free_clusters.zero?
+        return n_free_clusters if n_free_clusters.zero?
 
         reject!(&:empty_entry?)
 
         push_empty_entry(n_free_clusters)
 
-        self
+        n_free_clusters
       end
 
       #

@@ -164,15 +164,14 @@ module SMPTool
       # @param [<String>] old_filename
       # @param [<String>] new_filename
       #
-      # @return [Volume] self
+      # @return [Array<SMPTool::Filename>]
+      #   Old and new filenames of a renamed file.
       #
       def f_rename(old_filename, new_filename)
         @data.f_rename(
           Filename.new(ascii: old_filename),
           Filename.new(ascii: new_filename)
         )
-
-        self
       end
 
       #
@@ -180,24 +179,21 @@ module SMPTool
       #
       # @param [<String>] filename
       #
-      # @return [Volume] self
+      # @return [SMPTool::Filename]
+      #   Filename of deleted file.
       #
       def f_delete(filename)
         @data.f_delete(Filename.new(ascii: filename))
-
-        self
       end
 
       #
       # Consolidate all free space at the end ot the volume.
       #
-      # @return [Integer] n_free_clusters
+      # @return [Integer]
       #   Number of free clusters that were joined.
       #
       def squeeze
         @data.squeeze
-
-        self
       end
 
       private
