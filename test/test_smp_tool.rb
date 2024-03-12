@@ -74,13 +74,13 @@ class TestSMPTool < Minitest::Test
   end
 
   def test_init_new_volume
-    test_params = {
+    test_params = SMPTool::VirtualVolume::VolumeParams.new(
       n_clusters_allocated: 20,
       n_extra_bytes_per_entry: 0,
       n_dir_segs: 2,
       n_clusters_per_dir_seg: 2,
       extra_word: 0
-    }
+    )
 
     SMPTool::VirtualVolume::Volume.new(
       bootloader: SMPTool::Basic10::DEFAULT_BOOTLOADER,

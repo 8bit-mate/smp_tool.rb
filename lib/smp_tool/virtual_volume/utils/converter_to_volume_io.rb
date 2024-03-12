@@ -10,11 +10,11 @@ module SMPTool
         def initialize(volume)
           @bootloader = volume.bootloader
           @home_block = volume.home_block
-          @n_clusters_allocated = volume.volume_params[:n_clusters_allocated]
-          @n_extra_bytes_per_entry = volume.volume_params[:n_extra_bytes_per_entry]
-          @n_clusters_per_dir_seg = volume.volume_params[:n_clusters_per_dir_seg]
-          @n_max_entries_per_dir_seg = volume.volume_params[:n_max_entries_per_dir_seg]
-          @n_dir_segs = volume.volume_params[:n_dir_segs]
+          @n_clusters_allocated = volume.n_clusters_allocated
+          @n_extra_bytes_per_entry = volume.n_extra_bytes_per_entry
+          @n_clusters_per_dir_seg = volume.n_clusters_per_dir_seg
+          @n_max_entries_per_dir_seg = volume.n_max_entries_per_dir_seg
+          @n_dir_segs = volume.n_dir_segs
 
           @data = _group_entries(volume.data)
 

@@ -80,7 +80,7 @@ module SMPTool
         def _extract_raw_data(id)
           index = @data.find_index { |e| e.filename == id.radix50 }
 
-          raise ArgumentError, "File '#{id.ascii}' not found in the volume." unless index
+          raise ArgumentError, "File '#{id.ascii}' not found in the volume" unless index
 
           @data[index].data
         end

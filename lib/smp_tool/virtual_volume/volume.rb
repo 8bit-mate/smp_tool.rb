@@ -6,6 +6,11 @@ module SMPTool
     # Ruby representation of the volume.
     #
     class Volume
+      extend Forwardable
+
+      def_delegators :@volume_params, :n_clusters_allocated, :n_extra_bytes_per_entry, :n_dir_segs,
+                     :n_clusters_per_dir_seg, :extra_word, :n_max_entries_per_dir_seg, :n_max_entries
+
       attr_reader :bootloader, :home_block, :volume_params, :data
 
       def self.read_volume_io(volume_io)
@@ -20,21 +25,15 @@ module SMPTool
         @bootloader = bootloader
         @home_block = home_block
 
-        @volume_params = Utils::VolumeParamsValidator.call(volume_params)
+        @volume_params = volume_params
         @data = volume_data || Utils::EmptyVolDataInitializer.call(@volume_params)
-
-        @volume_params[:n_max_entries_per_dir_seg] =
-          volume_params[:n_max_entries_per_dir_seg] || _calc_n_max_entries_per_dir_seg
-
-        @n_max_entries = @volume_params[:n_dir_segs] * @volume_params[:n_max_entries_per_dir_seg]
       end
 
       def snapshot
         {
           volume_params: @volume_params,
           volume_data: @data.snapshot,
-          n_free_clusters: @data.calc_n_free_clusters,
-          n_max_entries: @n_max_entries
+          n_free_clusters: @data.calc_n_free_clusters
         }
       end
 
@@ -79,7 +78,7 @@ module SMPTool
       end
 
       #
-      # Push an arr. of files to the volume.
+      # Push a file to the volume.
       #
       # @param [FileInterface, Hash{ Symbol => Object }] file_obj
       #
@@ -157,8 +156,8 @@ module SMPTool
       # @param [<String>] old_filename
       # @param [<String>] new_filename
       #
-      # @return [Array<SMPTool::Filename>]
-      #   Old and new filenames of a renamed file.
+      # @return [Array<String>]
+      #   Old and new ASCII filenames of a renamed file.
       #
       def f_rename(old_filename, new_filename)
         @data.f_rename(
@@ -172,8 +171,8 @@ module SMPTool
       #
       # @param [<String>] filename
       #
-      # @return [SMPTool::Filename]
-      #   Filename of deleted file.
+      # @return [String]
+      #   ASCII filename of a deleted file.
       #
       def f_delete(filename)
         @data.f_delete(Filename.new(ascii: filename))
@@ -199,7 +198,7 @@ module SMPTool
       def _resize_check_pos_input(n_clusters)
         _check_dir_overflow
 
-        return unless n_clusters + @volume_params[:n_clusters_allocated] > N_CLUSTERS_MAX
+        return unless n_clusters + @volume_params.n_clusters_allocated > N_CLUSTERS_MAX
 
         raise ArgumentError, "Volume size can't be more than #{N_CLUSTERS_MAX} clusters"
       end
@@ -213,17 +212,12 @@ module SMPTool
       end
 
       def _resize(n_clusters)
-        @volume_params[:n_clusters_allocated] += n_clusters
+        @volume_params.n_clusters_allocated += n_clusters
         @data.resize(n_clusters)
       end
 
       def _check_dir_overflow
-        raise ArgumentError, "Directory table is full." if @data.length >= @n_max_entries
-      end
-
-      def _calc_n_max_entries_per_dir_seg
-        entry_size = ENTRY_BASE_SIZE + @volume_params[:n_extra_bytes_per_entry]
-        (((@volume_params[:n_clusters_per_dir_seg] * CLUSTER_SIZE) - HEADER_SIZE - FOOTER_SIZE) / entry_size).floor
+        raise ArgumentError, "Directory table is full" if @data.length >= @volume_params.n_max_entries
       end
 
       def _f_push(f_hash, &block)
@@ -233,7 +227,7 @@ module SMPTool
 
         file = SMPTool::VirtualVolume::Utils::FileConverter.new(
           f_hash,
-          @volume_params[:extra_word],
+          @volume_params.extra_word,
           &block
         ).call
 

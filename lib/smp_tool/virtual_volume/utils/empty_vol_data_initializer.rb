@@ -15,13 +15,13 @@ module SMPTool
         # @return [VolumeData]
         #
         def self.call(volume_params)
-          n_data_clusters = volume_params[:n_clusters_allocated] -
+          n_data_clusters = volume_params.n_clusters_allocated -
                             N_SYS_CLUSTERS -
-                            (volume_params[:n_dir_segs] * volume_params[:n_clusters_per_dir_seg])
+                            (volume_params.n_dir_segs * volume_params.n_clusters_per_dir_seg)
 
           data = VolumeData.new(
             [],
-            volume_params[:extra_word]
+            volume_params.extra_word
           )
 
           data.push_empty_entry(n_data_clusters)

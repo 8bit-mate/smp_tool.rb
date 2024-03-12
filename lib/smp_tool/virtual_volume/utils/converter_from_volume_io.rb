@@ -38,15 +38,14 @@ module SMPTool
             end
           end
 
-          def _parse_volume_params(volume_io)
-            {
+          def _build_volume_params(volume_io)
+            VirtualVolume::VolumeParams.new(
               n_clusters_allocated: volume_io.n_clusters_allocated.to_i,
               n_extra_bytes_per_entry: volume_io.n_extra_bytes_per_entry.to_i,
-              n_max_entries_per_dir_seg: volume_io.n_max_entries_per_dir_seg.to_i,
               n_dir_segs: volume_io.n_dir_segs.to_i,
               n_clusters_per_dir_seg: volume_io.n_clusters_per_dir_seg.to_i,
               extra_word: _choose_extra_word(volume_io.n_extra_bytes_per_entry)
-            }
+            )
           end
 
           def _read_entries(volume_io)
@@ -67,13 +66,13 @@ module SMPTool
 
           raise ArgumentError, "entries => data lengths mismatch" unless entries.length == data.length
 
-          volume_params = _parse_volume_params(volume_io)
+          volume_params = _build_volume_params(volume_io)
 
           VirtualVolume::Volume.new(
             bootloader: volume_io.bootloader.bytes.to_ary,
             home_block: volume_io.home_block.bytes.to_ary,
             volume_params: volume_params,
-            volume_data: _volume_data(entries, data, volume_params[:extra_word])
+            volume_data: _volume_data(entries, data, volume_params.extra_word)
           )
         end
       end

@@ -23,8 +23,8 @@ module SMPTool
       # @param [SMPTool::Filename] old_id
       # @param [SMPTool::Filename] new_id
       #
-      # @return [Array<SMPTool::Filename>]
-      #   Old and new filenames of a renamed file.
+      # @return [Array<String>]
+      #   Old and new ASCII filenames of a renamed file.
       #
       # @raise [ArgumentError]
       #   - Can't assign name `new_id` to the file since another file with
@@ -40,7 +40,7 @@ module SMPTool
 
         self[idx].rename(new_id.radix50)
 
-        [old_id, new_id]
+        [old_id.print_ascii, new_id.print_ascii]
       end
 
       #
@@ -48,8 +48,8 @@ module SMPTool
       #
       # @param [SMPTool::Filename] file_id
       #
-      # @return [SMPTool::Filename]
-      #   Filename of deleted file.
+      # @return [String]
+      #   ASCII filename of a deleted file.
       #
       # @raise [ArgumentError]
       #   - File with `file_id` not found.
@@ -61,7 +61,7 @@ module SMPTool
 
         self[idx].clean
 
-        file_id
+        file_id.print_ascii
       end
 
       #
@@ -180,11 +180,11 @@ module SMPTool
       end
 
       def _raise_file_not_found(filename)
-        raise ArgumentError, "File '#{filename}' not found on the volume."
+        raise ArgumentError, "File '#{filename}' not found on the volume"
       end
 
       def _raise_already_exists(filename)
-        raise ArgumentError, "File with the filename '#{filename}' already exists on the volume."
+        raise ArgumentError, "File with the filename '#{filename}' already exists on the volume"
       end
 
       #
