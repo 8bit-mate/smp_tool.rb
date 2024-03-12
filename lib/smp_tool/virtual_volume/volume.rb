@@ -6,6 +6,8 @@ module SMPTool
     # Ruby representation of the volume.
     #
     class Volume
+      attr_reader :bootloader, :home_block, :volume_params, :data
+
       def self.read_volume_io(volume_io)
         Utils::ConverterFromVolumeIO.read_volume_io(volume_io)
       end
@@ -42,12 +44,7 @@ module SMPTool
       # @return [VolumeIO]
       #
       def to_volume_io
-        Utils::ConverterToVolumeIO.new(
-          bootloader: @bootloader,
-          home_block: @home_block,
-          volume_params: @volume_params,
-          volume_data: @data
-        ).call
+        Utils::ConverterToVolumeIO.new(self).call
       end
 
       #
@@ -104,7 +101,7 @@ module SMPTool
       # Extract content of a file as an array of strings.
       #
       # @param [<String>] filename
-      #   ASCII filename.
+      #   ASCII filename of the file to extract.
       #
       # @yield [str]
       #   Each line of a file gets passed through this block. The default block decodes
@@ -135,7 +132,7 @@ module SMPTool
       # Extract content of a file as a 'raw' string (as is).
       #
       # @param [<String>] filename
-      #   ASCII filename.
+      #   ASCII filename of the file to extract.
       #
       # @return [FileInterface]
       #

@@ -4,7 +4,7 @@ module SMPTool
   module VirtualVolume
     module Utils
       #
-      # Extracts file(s).
+      # Extracts files.
       #
       class FileExtracter
         def initialize(data)
@@ -12,7 +12,7 @@ module SMPTool
         end
 
         #
-        # Extract file(s) as is.
+        # Extract file as is.
         #
         # @param [Filename] file_id
         #
@@ -26,7 +26,7 @@ module SMPTool
         end
 
         #
-        # Extract file(s) as array of strings.
+        # Extract file as array of strings.
         #
         # @param [Filename] file_id
         #
