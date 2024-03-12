@@ -31,7 +31,7 @@ module SMPTool
     # ASCII filename with a dot to separate extension.
     #
     def print_ascii(sep_chr = DEF_SEP_CHR)
-      @ascii.insert(ASCII_DOT_POS, sep_chr).rstrip
+      @ascii.insert(ASCII_DOT_POS, sep_chr)
     end
 
     private
