@@ -67,9 +67,9 @@ module SMPTool
       #
       def resize(n_clusters)
         if n_clusters.positive?
-          _resize_check_pos_input(n_clusters)
+          _resize_validate_pos_input(n_clusters)
         elsif n_clusters.negative?
-          _resize_check_neg_input(n_clusters)
+          _resize_validate_neg_input(n_clusters)
         else
           return n_clusters
         end
@@ -195,20 +195,18 @@ module SMPTool
              .map { |e| e.header.print_ascii_filename }
       end
 
-      def _resize_check_pos_input(n_clusters)
+      def _resize_validate_pos_input(n_delta_clusters)
         _check_dir_overflow
 
-        return unless n_clusters + @volume_params.n_clusters_allocated > N_CLUSTERS_MAX
+        return if n_delta_clusters + @volume_params.n_clusters_allocated <= N_CLUSTERS_MAX
 
         raise ArgumentError, "Volume size can't be more than #{N_CLUSTERS_MAX} clusters"
       end
 
-      def _resize_check_neg_input(n_clusters)
-        n_free_clusters = @data.calc_n_free_clusters
+      def _resize_validate_neg_input(n_delta_clusters)
+        return if n_delta_clusters.abs <= @data.calc_n_free_clusters
 
-        return unless n_clusters > n_free_clusters
-
-        raise ArgumentError, "Can't trim more than #{n_free_clusters} clusters" if diff.negative?
+        raise ArgumentError, "Can't trim more than #{n_free_clusters} clusters"
       end
 
       def _resize(n_clusters)
