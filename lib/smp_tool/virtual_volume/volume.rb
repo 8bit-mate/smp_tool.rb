@@ -31,7 +31,7 @@ module SMPTool
 
       def snapshot
         {
-          volume_params: @volume_params,
+          volume_params: @volume_params.snapshot,
           volume_data: @data.snapshot,
           n_free_clusters: @data.calc_n_free_clusters
         }

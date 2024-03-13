@@ -47,6 +47,18 @@ module SMPTool
         }
       end
 
+      def snapshot
+        {
+          n_clusters_allocated: @n_clusters_allocated,
+          n_extra_bytes_per_entry: @n_extra_bytes_per_entry,
+          n_dir_segs: @n_dir_segs,
+          n_clusters_per_dir_seg: @n_clusters_per_dir_seg,
+          extra_word: @extra_word,
+          n_max_entries_per_dir_seg: @n_max_entries_per_dir_seg,
+          n_max_entries: @n_max_entries
+        }
+      end
+
       private
 
       def _calc_n_max_entries_per_dir_seg
