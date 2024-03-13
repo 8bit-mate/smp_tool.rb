@@ -204,7 +204,9 @@ module SMPTool
       end
 
       def _resize_validate_neg_input(n_delta_clusters)
-        return if n_delta_clusters.abs <= @data.calc_n_free_clusters
+        n_free_clusters = @data.calc_n_free_clusters
+
+        return if n_delta_clusters.abs <= n_free_clusters
 
         raise ArgumentError, "Can't trim more than #{n_free_clusters} clusters"
       end
