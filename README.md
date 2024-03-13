@@ -1,24 +1,90 @@
-# SMPTool
+# smp_tool
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/smp_tool`. To experiment with that code, run `bin/console` for an interactive prompt.
+**smp_tool** is a Ruby library to work with the Elektronika MK90 volume images. There's a command-line interface: [smp_tool-cli](https://github.com/8bit-mate/smp_tool-cli.rb).
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Add this line to your application"s Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
+```ruby
+gem "smp_tool"
+```
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+And then execute:
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+    $ bundle install
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+Or install it yourself as:
+
+    $ gem install smp_tool
 
 ## Usage
 
-TODO: Write usage instructions here
+### Example
+
+Create a new empty volume:
+
+```Ruby
+require "smp_tool"
+
+params = SMPTool::VirtualVolume::VolumeParams.new(
+  n_clusters_allocated: 20,
+  n_extra_bytes_per_entry: 0,
+  n_dir_segs: 1,
+  n_clusters_per_dir_seg: 2,
+  extra_word: 0
+)
+
+volume = SMPTool::VirtualVolume::Volume.new(
+  bootloader: SMPTool::Basic10::DEFAULT_BOOTLOADER,
+  home_block: SMPTool::Basic10::HOME_BLOCK,
+  volume_params: params
+)
+```
+
+Or read an existing volume from a file:
+
+```Ruby
+io = File.read("/path/to/volume/smp0.bin")
+volume = SMPTool::VirtualVolume::Volume.read_io(io)
+```
+
+Now you can perform operations on the `volume` object, e.g.:
+
+```Ruby
+# Push a text file to the volume:
+volume.f_push(
+  {
+    filename: "hello.bas",
+    data: ["10 PRINT \"Hello, world\"", "20 GOTO 10"]
+  }
+)
+
+# Extract a file by its filename:
+volume.f_extract_txt("hello.bas")
+
+# Delete a file from the volume:
+volume.f_delete("hello.bas")
+
+# Consolidate all free space at the end ot the volume:
+volume.squeeze
+
+# Rename a file on the volume:
+volume.f_rename("old.bas", "new.bas")
+
+# Allocate more free clusters to the volume:
+volume.resize(10)
+
+# ...or trim some free clusters:
+volume.resize(-5)
+```
+
+When done, you can write modified volume back to a binary file:
+
+```Ruby
+data = volume.to_binary_s
+File.binwrite("/path/to/volume/smp0_edited.bin", data)
+```
 
 ## Development
 
@@ -28,7 +94,17 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/smp_tool.
+Bug reports and pull requests are welcome on GitHub at https://github.com/8bit-mate/smp_tool.rb.
+
+## Special thanks to
+
+- **[Piotr Piatek](http://www.pisi.com.pl/piotr433/index.htm)**: the indisputable master of the MK90 who developed lots of great software tools and hardware devices for the machine;
+
+- **[azya52](https://github.com/azya52/)**: developer of the PIMP cartridge. This device made possible to load large volumes on a real MK90;
+
+- **[flint-1979](https://phantom.sannata.org/memberlist.php?mode=viewprofile&u=6909)**: testing on the real machines with both BASIC v.1.0 and v.2.0;
+
+- **[BitSavers project](http://www.bitsavers.org/)**: the largest source of the DEC PDP-11 / RT-11 and other legacy systems documentation.
 
 ## License
 

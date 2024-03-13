@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["8bit-m8"]
   spec.email = ["you@example.com"]
 
-  spec.summary = "MK90 SMP tool"
+  spec.summary = "A library to work with the Elektronika MK90 volume images"
   spec.homepage = "https://github.com/8bit-mate/smp_tool.rb"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"

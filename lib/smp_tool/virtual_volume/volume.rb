@@ -21,6 +21,17 @@ module SMPTool
         Utils::ConverterFromVolumeIO.read_io(volume_io)
       end
 
+      #
+      # Create new virtual volume.
+      #
+      # @param [Array<Integer>] bootloader
+      # @param [Array<Integer>] home_block
+      # @param [VolumeParams] volume_params
+      # @param [VolumeData, nil] volume_data
+      #   Existing volume data (parsed from an existing VolumeIO obj) or nil.
+      #   Nil indicates that an empty volume should be created, and empty data
+      #   must be initialized.
+      #
       def initialize(bootloader:, home_block:, volume_params:, volume_data: nil)
         @bootloader = bootloader
         @home_block = home_block

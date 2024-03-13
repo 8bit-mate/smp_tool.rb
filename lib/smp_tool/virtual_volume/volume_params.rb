@@ -51,7 +51,7 @@ module SMPTool
         raise ArgumentError, result.errors.to_h.to_a.join(": ") unless result.success?
       end
 
-      def input_snapshot
+      def _input_snapshot
         {
           n_clusters_allocated: @n_clusters_allocated,
           n_extra_bytes_per_entry: @n_extra_bytes_per_entry,
