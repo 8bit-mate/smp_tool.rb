@@ -1,6 +1,6 @@
 # smp_tool
 
-**smp_tool** is a Ruby library to work with the Elektronika MK90 volume images. There's a command-line interface: [smp_tool-cli](https://github.com/8bit-mate/smp_tool-cli.rb).
+A Ruby library to work with the Elektronika MK90 volume images. There's a command-line interface: [smp_tool-cli](https://github.com/8bit-mate/smp_tool-cli.rb).
 
 ## Installation
 
@@ -66,7 +66,7 @@ volume.f_extract_txt("hello.bas")
 # Delete a file from the volume:
 volume.f_delete("hello.bas")
 
-# Consolidate all free space at the end ot the volume:
+# Consolidate all free space at the end of the volume:
 volume.squeeze
 
 # Rename a file on the volume:
