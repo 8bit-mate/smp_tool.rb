@@ -20,8 +20,6 @@ Or install it yourself as:
 
 ## Usage
 
-### Example
-
 Create a new empty volume:
 
 ```Ruby
